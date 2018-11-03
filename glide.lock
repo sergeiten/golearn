@@ -1,0 +1,30 @@
+hash: b45d15585b1471ec0474073ebaad11a47ea54bf3dc307494817e8b2f5b7464c3
+updated: 2018-10-09T11:08:11.615513+09:00
+imports:
+- name: github.com/go-sql-driver/mysql
+  version: d523deb1b23d913de5bdada721a6071e71283618
+- name: github.com/konsorten/go-windows-terminal-sequences
+  version: 5c8c8bd35d3832f5d134ae1e1e375b69a4d25242
+- name: github.com/sirupsen/logrus
+  version: ad15b42461921f1fb3529b058c6786c6a45d5162
+- name: golang.org/x/crypto
+  version: 6a293f2d4b14b8e6d3f0539e383f6d0d30fce3fd
+  subpackages:
+  - ssh/terminal
+- name: golang.org/x/sys
+  version: 1e2299c37cc91a509f1b12369872d27be0ce98a6
+  subpackages:
+  - unix
+  - windows
+- name: google.golang.org/appengine
+  version: ae0ab99deb4dc413a2b4bd6c8bdd0eb67f1e4d06
+  subpackages:
+  - cloudsql
+- name: gopkg.in/mgo.v2
+  version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
+  subpackages:
+  - bson
+  - internal/json
+  - internal/sasl
+  - internal/scram
+testImports: []
