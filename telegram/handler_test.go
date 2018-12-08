@@ -16,6 +16,7 @@ import (
 
 var botToken = "644925777:AAEJyzTEOSTCyXdxutKYWTaFA-A3tTPxeTA"
 var handler *Handler
+var lang golearn.Lang
 
 func init() {
 	log.SetFormatter(&golearn.LogFormatter{})
@@ -31,7 +32,7 @@ func init() {
 		},
 		DefaultLanguage: "ru",
 	}
-	lang := golearn.GetLanguage("../lang.json")
+	lang = golearn.GetLanguage("../lang.json")
 
 	service, err := mongo.New(cfg)
 	if err != nil {
@@ -49,35 +50,57 @@ func init() {
 }
 
 func TestHandler(t *testing.T) {
-	json := `{"update_id":148790442,"message":{"message_id":27,"from":{"id":177374215,"first_name":"Sergei","last_name":"Ten","username":"sergeiten"},"chat":{"id":177374215,"first_name":"Sergei","last_name":"Ten","username":"sergeiten","type":"private"},"date":1459919262,"text":"/start"}}`
-
-	req, err := http.NewRequest("POST", "/"+botToken+"/processMessage/", strings.NewReader(json))
-	if err != nil {
-		t.Fatal(err)
+	commands := []string{
+		lang["ru"]["main_menu"],
+		lang["ru"]["help"],
+		lang["ru"]["start"],
+		lang["ru"]["next_word"],
+		lang["ru"]["again"],
 	}
 
-	err = handler.Serve()
+	err := handler.Serve()
 	if err != nil {
 		t.Fatalf("failed to serve: %v", err)
 	}
 
-	rr := httptest.NewRecorder()
+	for _, command := range commands {
+		update := TUpdate{
+			UpdateID: 148790442,
+			Message: TMessage{
+				MessageID: 27,
+				Text:      command,
+				Date:      1459919262,
+			},
+		}
 
-	handler.ServeHTTP(rr, req)
+		dat, err := json.Marshal(update)
+		if err != nil {
+			t.Fatalf("failed to marshal update: %v", err)
+		}
 
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("handler returned wrong status code: got %v, want %v", status, http.StatusOK)
-	}
+		req, err := http.NewRequest("POST", "/"+botToken+"/processMessage/", strings.NewReader(string(dat)))
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	data, err := ioutil.ReadAll(rr.Body)
-	if err != nil {
-		t.Errorf("failed to read response body: %v", err)
-	}
+		rr := httptest.NewRecorder()
 
-	resp := string(data)
+		handler.ServeHTTP(rr, req)
 
-	if resp != "OK" {
-		t.Errorf("handler response wrong body: got %s, want %s", resp, "OK")
+		if status := rr.Code; status != http.StatusOK {
+			t.Errorf("handler returned wrong status code: got %v, want %v", status, http.StatusOK)
+		}
+
+		data, err := ioutil.ReadAll(rr.Body)
+		if err != nil {
+			t.Errorf("failed to read response body: %v", err)
+		}
+
+		resp := string(data)
+
+		if resp != "OK" {
+			t.Errorf("handler response wrong body: got %s, want %s", resp, "OK")
+		}
 	}
 }
 

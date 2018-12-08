@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/sergeiten/golearn"
-
 	log "github.com/sirupsen/logrus"
 )
 
@@ -55,6 +54,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	update := h.parseUpdate(r)
 
 	switch update.Message.Text {
+	case h.lang[h.langCode]["main_menu"]:
+		err = h.mainMenu(update)
 	case h.lang[h.langCode]["help"]:
 		err = h.help(update)
 	case h.lang[h.langCode]["start"]:
@@ -216,7 +217,7 @@ func (h *Handler) replyKeyboardWithAnswers(answers []golearn.Row) ReplyMarkup {
 		keyboard[i] = options[start:finish]
 	}
 
-	keyboard[rows] = []string{"/Главное Меню"}
+	keyboard[rows] = []string{"/" + h.lang[h.langCode]["main_menu"]}
 
 	reply.Keyboard = keyboard
 	reply.ResizeKeyboard = true
@@ -294,4 +295,17 @@ func (h *Handler) parseUpdate(r *http.Request) TUpdate {
 
 func (h *Handler) isAnswerRight(state golearn.State, update TUpdate) bool {
 	return state.Question.Translate == update.Message.Text
+}
+
+func (h *Handler) mainMenu(update TUpdate) error {
+	reply := ReplyMarkup{
+		Keyboard: [][]string{
+			[]string{h.lang[h.langCode]["start"], h.lang[h.langCode]["help"]},
+		},
+		ResizeKeyboard: true,
+	}
+
+	h.sendMessage(update.Message.Chat.ID, h.lang[h.langCode]["welcome"], reply)
+
+	return nil
 }
