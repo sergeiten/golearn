@@ -69,17 +69,17 @@ type DBService interface {
 }
 
 // GetLanguage returns lang object with phrases
-func GetLanguage(file string) Lang {
+func GetLanguage(file string) (Lang, error) {
 	jsonLang, err := ioutil.ReadFile(file)
 	if err != nil {
-		log.WithError(err).Fatalf("failed to open language json file")
+		return nil, err
 	}
 
 	var lang = Lang{}
 	err = json.Unmarshal(jsonLang, &lang)
 	if err != nil {
-		log.WithError(err).Fatalf("failed to unmarshal json language file")
+		return nil, err
 	}
 
-	return lang
+	return lang, nil
 }

@@ -27,11 +27,14 @@ func init() {
 
 func main() {
 	cfg := golearn.ConfigFromEnv()
-	language := golearn.GetLanguage("./lang.json")
+	language, err := golearn.GetLanguage("./lang.json")
+	if err != nil {
+		log.WithError(err).Fatal("failed to get language instance")
+	}
 
 	service, err := mongo.New(cfg)
 	if err != nil {
-		log.Fatalf("failed to create mongodb instance: %v", err)
+		log.WithError(err).Fatal("failed to create mongodb instance")
 	}
 
 	cols, err := strconv.Atoi(os.Getenv("TELEGRAM_COLS_COUNT"))

@@ -31,7 +31,12 @@ func init() {
 		},
 		DefaultLanguage: "ru",
 	}
-	lang = golearn.GetLanguage("../lang.json")
+
+	var err error
+	lang, err = golearn.GetLanguage("../lang.json")
+	if err != nil {
+		log.WithError(err).Fatalf("failed to create language instance: %v", err)
+	}
 
 	service, err := mongo.New(cfg)
 	if err != nil {
