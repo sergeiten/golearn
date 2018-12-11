@@ -68,9 +68,9 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		err = h.again(update)
 	case h.lang["settings"]:
 		err = h.settings(update)
-	case h.lang["settings_icon"] + " " + h.lang["mode_picking"]:
+	case h.lang["mode_picking"]:
 		err = h.setMode(update, golearn.ModePicking)
-	case h.lang["settings_icon"] + " " + h.lang["mode_typing"]:
+	case h.lang["mode_typing"]:
 		err = h.setMode(update, golearn.ModeTyping)
 	default:
 		err = h.answer(update)
@@ -166,8 +166,9 @@ func (h *Handler) help(update TUpdate) error {
 
 	reply.ResizeKeyboard = true
 	reply.Keyboard = [][]string{
-		[]string{
+		{
 			h.lang["start"],
+			h.lang["settings"],
 			h.lang["help"],
 		},
 	}
@@ -224,7 +225,7 @@ func (h *Handler) replyKeyboardWithAnswers(answers []golearn.Row) ReplyMarkup {
 		keyboard[i] = options[start:finish]
 	}
 
-	keyboard[rows] = []string{"/" + h.lang["main_menu"]}
+	keyboard[rows] = []string{h.lang["main_menu"]}
 
 	reply.Keyboard = keyboard
 	reply.ResizeKeyboard = true
@@ -242,7 +243,7 @@ func (h *Handler) baseKeyboardCommands() ReplyMarkup {
 	var reply ReplyMarkup
 
 	keyboard := [][]string{
-		[]string{h.lang["start"], h.lang["help"]},
+		{h.lang["start"], h.lang["settings"], h.lang["help"]},
 	}
 
 	reply.Keyboard = keyboard
@@ -307,7 +308,7 @@ func (h *Handler) isAnswerRight(state golearn.State, update TUpdate) bool {
 func (h *Handler) mainMenu(update TUpdate) error {
 	reply := ReplyMarkup{
 		Keyboard: [][]string{
-			[]string{
+			{
 				h.lang["start"],
 				h.lang["settings"],
 				h.lang["help"],
@@ -344,9 +345,9 @@ func (h *Handler) createUser(update TUpdate) error {
 func (h *Handler) settings(update TUpdate) error {
 	reply := ReplyMarkup{
 		Keyboard: [][]string{
-			[]string{
-				h.lang["settings_icon"] + " " + h.lang["mode_picking"],
-				h.lang["settings_icon"] + " " + h.lang["mode_typing"],
+			{
+				h.lang["mode_picking"],
+				h.lang["mode_typing"],
 			},
 		},
 		ResizeKeyboard: true,
@@ -379,5 +380,4 @@ func (h *Handler) setMode(update TUpdate, mode string) error {
 	}
 
 	return h.service.InsertUser(user)
-
 }

@@ -58,8 +58,8 @@ func TestHandler(t *testing.T) {
 		l["next_word"],
 		l["again"],
 		l["settings"],
-		l["settings_icon"] + " " + l["mode_picking"],
-		l["settings_icon"] + " " + l["mode_picking"],
+		l["mode_picking"],
+		l["mode_picking"],
 	}
 
 	err := handler.Serve()
