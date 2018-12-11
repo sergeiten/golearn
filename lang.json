@@ -14,7 +14,8 @@
     "settings_icon": "⚙️",
     "mode_picking": "⚙️ Picking mode",
     "mode_typing": "⚙️ Typing mode",
-    "mode_set": "Mode has been set successfully"
+    "mode_set": "Mode has been set successfully",
+    "right_answer_is": "Right answer is %s"
   },
   "ru": {
     "start": "⚡ Начать",
@@ -32,6 +33,7 @@
     "mode_picking": "⚙️ Режим выбора правильного ответа",
     "mode_typing": "⚙️ Режим ввода правильного ответа",
     "mode_explain": "В режиме \"выбора\", вам предлагается 4 варианта ответов из которых вы можете выбрать правильный ответ. В режиме \"ввода\" вам нужно напечатать правильный ответ самостоятельно",
-    "mode_set": "Режим успешно установлен"
+    "mode_set": "Режим успешно установлен",
+    "right_answer_is": "Правильный ответ %s"
   }
 }

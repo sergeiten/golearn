@@ -1,6 +1,7 @@
 package telegram
 
 import (
+	"fmt"
 	"log"
 	"math"
 	"math/rand"
@@ -121,6 +122,10 @@ func (h *Handler) answer(update TUpdate) error {
 
 		if h.user.Mode == golearn.ModePicking {
 			reply.Keyboard = append(reply.Keyboard, []string{h.lang["again"]})
+		}
+
+		if h.user.Mode == golearn.ModeTyping {
+			message += "\n\n" + fmt.Sprintf(h.lang["right_answer_is"], state.Question.Word)
 		}
 	}
 
