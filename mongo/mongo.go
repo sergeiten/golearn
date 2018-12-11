@@ -128,7 +128,7 @@ func (s Service) ExistUser(user golearn.User) (bool, error) {
 // GetUser returns user from db
 func (s Service) GetUser(userid string) (golearn.User, error) {
 	u := golearn.User{}
-	err := s.session.DB("golean").C("users").Find(bson.M{"userid": userid}).One(&u)
+	err := s.session.DB("golearn").C("users").Find(bson.M{"userid": userid}).One(&u)
 
 	return u, err
 }

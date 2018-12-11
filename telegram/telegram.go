@@ -19,7 +19,7 @@ type TMessage struct {
 // TChat ...
 type TChat struct {
 	Username  string `json:"username"`
-	FirstName string `json:"first_name"`
+	Firstname string `json:"first_name"`
 	ID        int    `json:"id"`
 }
 
