@@ -10,7 +10,6 @@ import (
 
 	"github.com/sergeiten/golearn"
 	"github.com/sergeiten/golearn/mongo"
-
 	log "github.com/sirupsen/logrus"
 )
 
@@ -50,12 +49,17 @@ func init() {
 }
 
 func TestHandler(t *testing.T) {
+	l := lang["ru"]
+
 	commands := []string{
-		lang["ru"]["main_menu"],
-		lang["ru"]["help"],
-		lang["ru"]["start"],
-		lang["ru"]["next_word"],
-		lang["ru"]["again"],
+		l["main_menu"],
+		l["help"],
+		l["start"],
+		l["next_word"],
+		l["again"],
+		l["settings"],
+		l["settings_icon"] + " " + l["mode_picking"],
+		l["settings_icon"] + " " + l["mode_picking"],
 	}
 
 	err := handler.Serve()

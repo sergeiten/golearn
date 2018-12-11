@@ -8,6 +8,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// ModeTyping ...
+const ModeTyping = "typing"
+
+// ModePicking ...
+const ModePicking = "picking"
+
 // LogFormatter ...
 type LogFormatter struct{}
 
@@ -30,11 +36,20 @@ type Row struct {
 	Translate string
 }
 
+// User ...
+type User struct {
+	UserID   string
+	Username string
+	Name     string
+	Mode     string
+}
+
 // State ...
 type State struct {
 	UserKey   string
 	Question  Row
 	Answers   []Row
+	Mode      string
 	Timestamp int64
 }
 
@@ -46,6 +61,11 @@ type DBService interface {
 	GetState(string) (State, error)
 	ResetState(string) error
 	InsertWord(Row) error
+	InsertUser(user User) error
+	UpdateUser(user User) error
+	ExistUser(user User) (bool, error)
+	GetUser(userid string) (User, error)
+	SetUserMode(userID string, mode string) error
 }
 
 // GetLanguage returns lang object with phrases

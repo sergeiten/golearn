@@ -6,10 +6,9 @@ import (
 	"time"
 
 	"github.com/sergeiten/golearn"
+	log "github.com/sirupsen/logrus"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-
-	log "github.com/sirupsen/logrus"
 )
 
 // Service of mongodb
@@ -108,4 +107,36 @@ func (s Service) ResetState(userKey string) error {
 // InsertWord inserts new row to words collection
 func (s Service) InsertWord(w golearn.Row) error {
 	return s.session.DB("golearn").C("words").Insert(w)
+}
+
+// InsertUser inserts new user to users collection
+func (s Service) InsertUser(user golearn.User) error {
+	return s.session.DB("golearn").C("users").Insert(user)
+}
+
+// UpdateUser updates user
+func (s Service) UpdateUser(user golearn.User) error {
+	return s.session.DB("golearn").C("users").Update(bson.M{"userid": user.UserID}, user)
+}
+
+// ExistUser returns bool if user already exists in db
+func (s Service) ExistUser(user golearn.User) (bool, error) {
+	count, err := s.session.DB("golearn").C("users").Find(bson.M{"userid": user.UserID}).Count()
+	return count > 0, err
+}
+
+// GetUser returns user from db
+func (s Service) GetUser(userid string) (golearn.User, error) {
+	u := golearn.User{}
+	err := s.session.DB("golean").C("users").Find(bson.M{"userid": userid}).One(&u)
+
+	return u, err
+}
+
+func (s Service) SetUserMode(userid string, mode string) error {
+	return s.session.DB("golearn").C("users").Update(bson.M{"userid": userid}, bson.M{
+		"$set": bson.M{
+			"mode": mode,
+		},
+	})
 }

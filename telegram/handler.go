@@ -20,18 +20,19 @@ import (
 // Handler telegram HTTP handler
 type Handler struct {
 	service  golearn.DBService
-	lang     golearn.Lang
+	lang     golearn.Phrase
 	langCode string
 	token    string
 	api      string
 	cols     int
+	user     golearn.User
 }
 
 // New returns new instance of telegram hanlder
 func New(cfg Config) *Handler {
 	return &Handler{
 		service:  cfg.Service,
-		lang:     cfg.Lang,
+		lang:     cfg.Lang[cfg.DefaultLanguage],
 		langCode: cfg.DefaultLanguage,
 		token:    cfg.Token,
 		api:      cfg.API,
@@ -54,17 +55,23 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	update := h.parseUpdate(r)
 
 	switch update.Message.Text {
-	case h.lang[h.langCode]["main_menu"]:
+	case h.lang["main_menu"]:
 		err = h.mainMenu(update)
-	case h.lang[h.langCode]["help"]:
+	case h.lang["help"]:
 		err = h.help(update)
-	case h.lang[h.langCode]["start"]:
+	case h.lang["start"]:
 		h.sendWelcomeMessage(update)
 		err = h.start(update)
-	case h.lang[h.langCode]["next_word"]:
+	case h.lang["next_word"]:
 		err = h.start(update)
-	case h.lang[h.langCode]["again"]:
+	case h.lang["again"]:
 		err = h.again(update)
+	case h.lang["settings"]:
+		err = h.settings(update)
+	case h.lang["settings_icon"] + " " + h.lang["mode_picking"]:
+		err = h.setMode(update, golearn.ModePicking)
+	case h.lang["settings_icon"] + " " + h.lang["mode_typing"]:
+		err = h.setMode(update, golearn.ModeTyping)
 	default:
 		err = h.answer(update)
 	}
@@ -98,7 +105,7 @@ func (h *Handler) start(update TUpdate) error {
 	}
 
 	if len(answers) == 0 {
-		h.sendMessage(update.Message.Chat.ID, h.lang[h.langCode]["no_words"], ReplyMarkup{})
+		h.sendMessage(update.Message.Chat.ID, h.lang["no_words"], ReplyMarkup{})
 		return nil
 	}
 
@@ -141,12 +148,12 @@ func (h *Handler) answer(update TUpdate) error {
 
 	reply.ResizeKeyboard = true
 	reply.Keyboard = [][]string{
-		[]string{h.lang[h.langCode]["next_word"]},
+		[]string{h.lang["next_word"]},
 	}
-	message := h.lang[h.langCode]["right"]
+	message := h.lang["right"]
 	if !isRight {
-		message = h.lang[h.langCode]["wrong"]
-		reply.Keyboard = append(reply.Keyboard, []string{h.lang[h.langCode]["again"]})
+		message = h.lang["wrong"]
+		reply.Keyboard = append(reply.Keyboard, []string{h.lang["again"]})
 	}
 
 	h.sendMessage(update.Message.Chat.ID, message, reply)
@@ -160,12 +167,12 @@ func (h *Handler) help(update TUpdate) error {
 	reply.ResizeKeyboard = true
 	reply.Keyboard = [][]string{
 		[]string{
-			h.lang[h.langCode]["start"],
-			h.lang[h.langCode]["help"],
+			h.lang["start"],
+			h.lang["help"],
 		},
 	}
 
-	h.sendMessage(update.Message.Chat.ID, h.lang[h.langCode]["help_message"], reply)
+	h.sendMessage(update.Message.Chat.ID, h.lang["help_message"], reply)
 
 	return nil
 }
@@ -217,7 +224,7 @@ func (h *Handler) replyKeyboardWithAnswers(answers []golearn.Row) ReplyMarkup {
 		keyboard[i] = options[start:finish]
 	}
 
-	keyboard[rows] = []string{"/" + h.lang[h.langCode]["main_menu"]}
+	keyboard[rows] = []string{"/" + h.lang["main_menu"]}
 
 	reply.Keyboard = keyboard
 	reply.ResizeKeyboard = true
@@ -228,14 +235,14 @@ func (h *Handler) replyKeyboardWithAnswers(answers []golearn.Row) ReplyMarkup {
 func (h *Handler) sendWelcomeMessage(update TUpdate) {
 	keyboard := h.baseKeyboardCommands()
 
-	h.sendMessage(update.Message.Chat.ID, h.lang[h.langCode]["welcome"], keyboard)
+	h.sendMessage(update.Message.Chat.ID, h.lang["welcome"], keyboard)
 }
 
 func (h *Handler) baseKeyboardCommands() ReplyMarkup {
 	var reply ReplyMarkup
 
 	keyboard := [][]string{
-		[]string{h.lang[h.langCode]["start"], h.lang[h.langCode]["help"]},
+		[]string{h.lang["start"], h.lang["help"]},
 	}
 
 	reply.Keyboard = keyboard
@@ -300,12 +307,77 @@ func (h *Handler) isAnswerRight(state golearn.State, update TUpdate) bool {
 func (h *Handler) mainMenu(update TUpdate) error {
 	reply := ReplyMarkup{
 		Keyboard: [][]string{
-			[]string{h.lang[h.langCode]["start"], h.lang[h.langCode]["help"]},
+			[]string{
+				h.lang["start"],
+				h.lang["settings"],
+				h.lang["help"],
+			},
 		},
 		ResizeKeyboard: true,
 	}
 
-	h.sendMessage(update.Message.Chat.ID, h.lang[h.langCode]["welcome"], reply)
+	h.sendMessage(update.Message.Chat.ID, h.lang["welcome"], reply)
 
 	return nil
+}
+
+func (h *Handler) createUser(update TUpdate) error {
+	u := golearn.User{
+		UserID:   strconv.Itoa(update.Message.Chat.ID),
+		Username: update.Message.Chat.Username,
+		Name:     update.Message.Chat.FirstName,
+		Mode:     golearn.ModePicking,
+	}
+
+	exist, err := h.service.ExistUser(u)
+	if err != nil {
+		return err
+	}
+
+	if exist {
+		return h.service.UpdateUser(u)
+	}
+
+	return h.service.InsertUser(u)
+}
+
+func (h *Handler) settings(update TUpdate) error {
+	reply := ReplyMarkup{
+		Keyboard: [][]string{
+			[]string{
+				h.lang["settings_icon"] + " " + h.lang["mode_picking"],
+				h.lang["settings_icon"] + " " + h.lang["mode_typing"],
+			},
+		},
+		ResizeKeyboard: true,
+	}
+
+	h.sendMessage(update.Message.Chat.ID, h.lang["mode_explain"], reply)
+
+	return nil
+}
+
+func (h *Handler) setMode(update TUpdate, mode string) error {
+	userId := strconv.Itoa(update.Message.Chat.ID)
+
+	exist, err := h.service.ExistUser(golearn.User{
+		UserID: userId,
+	})
+	if err != nil {
+		return err
+	}
+
+	if exist {
+		return h.service.SetUserMode(userId, mode)
+	}
+
+	user := golearn.User{
+		UserID:   strconv.Itoa(update.Message.Chat.ID),
+		Username: update.Message.Chat.Username,
+		Name:     update.Message.Chat.FirstName,
+		Mode:     mode,
+	}
+
+	return h.service.InsertUser(user)
+
 }
