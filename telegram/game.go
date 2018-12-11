@@ -96,7 +96,7 @@ func (h *Handler) startWithTypingMode(update TUpdate) error {
 		true,
 	}
 
-	h.sendMessage(update.Message.Chat.ID, question.Word, keyboard)
+	h.sendMessage(update.Message.Chat.ID, question.Translate, keyboard)
 
 	return nil
 }
@@ -130,7 +130,11 @@ func (h *Handler) answer(update TUpdate) error {
 }
 
 func (h *Handler) isAnswerRight(state golearn.State, update TUpdate) bool {
-	return state.Question.Translate == update.Message.Text
+	toCompare := state.Question.Translate
+	if h.user.Mode == golearn.ModeTyping {
+		toCompare = state.Question.Word
+	}
+	return toCompare == update.Message.Text
 }
 
 func (h *Handler) again(update TUpdate) error {
