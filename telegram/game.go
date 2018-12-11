@@ -90,8 +90,9 @@ func (h *Handler) startWithTypingMode(update TUpdate) error {
 	keyboard := ReplyMarkup{
 		[][]string{
 			{
-				h.lang["main_menu"],
 				h.lang["next_word"],
+				h.lang["show_answer"],
+				h.lang["main_menu"],
 			},
 		},
 		true,
@@ -130,6 +131,29 @@ func (h *Handler) answer(update TUpdate) error {
 	}
 
 	h.sendMessage(update.Message.Chat.ID, message, reply)
+
+	return nil
+}
+
+func (h *Handler) showAnswer(update TUpdate) error {
+	state, err := h.service.GetState(strconv.Itoa(update.Message.Chat.ID))
+	if err != nil {
+		return err
+	}
+
+	keyboard := ReplyMarkup{
+		[][]string{
+			{
+				h.lang["next_word"],
+				h.lang["main_menu"],
+			},
+		},
+		true,
+	}
+
+	message := fmt.Sprintf(h.lang["right_answer_is"], state.Question.Word)
+
+	h.sendMessage(update.Message.Chat.ID, message, keyboard)
 
 	return nil
 }

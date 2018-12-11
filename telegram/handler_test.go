@@ -60,6 +60,7 @@ func TestHandler(t *testing.T) {
 		l["settings"],
 		l["mode_picking"],
 		l["mode_picking"],
+		l["show_answer"],
 	}
 
 	err := handler.Serve()

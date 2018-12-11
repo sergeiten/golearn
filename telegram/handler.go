@@ -71,6 +71,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		err = h.setMode(update, golearn.ModePicking)
 	case h.lang["mode_typing"]:
 		err = h.setMode(update, golearn.ModeTyping)
+	case h.lang["show_answer"]:
+		err = h.showAnswer(update)
 	default:
 		err = h.answer(update)
 	}
