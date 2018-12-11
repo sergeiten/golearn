@@ -129,27 +129,7 @@ func (h *Handler) settings(update TUpdate) error {
 }
 
 func (h *Handler) setMode(update TUpdate, mode string) error {
-	userId := strconv.Itoa(update.Message.Chat.ID)
-
-	exist, err := h.service.ExistUser(golearn.User{
-		UserID: userId,
-	})
-	if err != nil {
-		return err
-	}
-
-	if exist {
-		return h.service.SetUserMode(userId, mode)
-	}
-
-	user := golearn.User{
-		UserID:   strconv.Itoa(update.Message.Chat.ID),
-		Username: update.Message.Chat.Username,
-		Name:     update.Message.Chat.Firstname,
-		Mode:     mode,
-	}
-
-	err = h.service.InsertUser(user)
+	err := h.service.SetUserMode(h.user.UserID, mode)
 	if err != nil {
 		return err
 	}
