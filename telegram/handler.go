@@ -306,7 +306,15 @@ func (h *Handler) isAnswerRight(state golearn.State, update TUpdate) bool {
 }
 
 func (h *Handler) mainMenu(update TUpdate) error {
-	reply := ReplyMarkup{
+	reply := h.mainMenuKeyboard()
+
+	h.sendMessage(update.Message.Chat.ID, h.lang["welcome"], reply)
+
+	return nil
+}
+
+func (h *Handler) mainMenuKeyboard() ReplyMarkup {
+	return ReplyMarkup{
 		Keyboard: [][]string{
 			{
 				h.lang["start"],
@@ -316,10 +324,6 @@ func (h *Handler) mainMenu(update TUpdate) error {
 		},
 		ResizeKeyboard: true,
 	}
-
-	h.sendMessage(update.Message.Chat.ID, h.lang["welcome"], reply)
-
-	return nil
 }
 
 func (h *Handler) createUser(update TUpdate) error {
@@ -379,5 +383,14 @@ func (h *Handler) setMode(update TUpdate, mode string) error {
 		Mode:     mode,
 	}
 
-	return h.service.InsertUser(user)
+	err = h.service.InsertUser(user)
+	if err != nil {
+		return err
+	}
+
+	reply := h.mainMenuKeyboard()
+
+	h.sendMessage(update.Message.Chat.ID, h.lang["mode_set"], reply)
+
+	return nil
 }
