@@ -6,8 +6,7 @@ import (
 	"time"
 
 	"github.com/sergeiten/golearn"
-	log "github.com/sirupsen/logrus"
-	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -29,10 +28,7 @@ func New(cfg *golearn.Config) (golearn.DBService, error) {
 }
 
 func newSession(cfg *golearn.Config) (*mgo.Session, error) {
-	// connectionString := fmt.Sprintf("mongodb://%s:%s/%s", cfg.Database.Host, cfg.Database.Port, cfg.Database.Name)
-
 	connString := fmt.Sprintf("%s:%s", cfg.Database.Host, cfg.Database.Port)
-	log.Debugf("mongodb connection string: %s", connString)
 
 	timeout := time.Duration(5 * time.Second)
 	session, err := mgo.DialWithTimeout(connString, timeout)
@@ -43,6 +39,11 @@ func newSession(cfg *golearn.Config) (*mgo.Session, error) {
 	session.SetMode(mgo.Monotonic, true)
 
 	return session, nil
+}
+
+// Close terminates the service session
+func (s Service) Close() {
+	s.session.Close()
 }
 
 // RandomQuestion returns random row

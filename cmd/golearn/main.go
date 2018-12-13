@@ -34,6 +34,7 @@ func main() {
 
 	service, err := mongo.New(cfg)
 	golearn.LogFatal(err, "failed to create mongodb instance")
+	defer service.Close()
 
 	cols, err := strconv.Atoi(os.Getenv("TELEGRAM_COLS_COUNT"))
 	if err != nil {

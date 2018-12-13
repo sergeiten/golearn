@@ -57,6 +57,7 @@ type DBService interface {
 	ExistUser(user User) (bool, error)
 	GetUser(userid string) (User, error)
 	SetUserMode(userID string, mode string) error
+	Close()
 }
 
 // GetLanguage returns language object with phrases
