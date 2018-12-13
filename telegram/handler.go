@@ -13,7 +13,7 @@ import (
 // Handler telegram HTTP handler
 type Handler struct {
 	service  golearn.DBService
-	lang     golearn.Phrase
+	lang     golearn.Language
 	langCode string
 	token    string
 	api      string
@@ -25,7 +25,7 @@ type Handler struct {
 func New(cfg Config) *Handler {
 	return &Handler{
 		service:  cfg.Service,
-		lang:     cfg.Lang[cfg.DefaultLanguage],
+		lang:     cfg.Lang,
 		langCode: cfg.DefaultLanguage,
 		token:    cfg.Token,
 		api:      cfg.API,

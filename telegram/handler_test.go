@@ -2,6 +2,7 @@ package telegram
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -15,7 +16,7 @@ import (
 
 var botToken = "644925777:AAEJyzTEOSTCyXdxutKYWTaFA-A3tTPxeTA"
 var handler *Handler
-var lang golearn.Lang
+var lang golearn.Language
 
 func init() {
 	log.SetFormatter(&golearn.LogFormatter{})
@@ -32,8 +33,12 @@ func init() {
 		DefaultLanguage: "ru",
 	}
 
-	var err error
-	lang, err = golearn.GetLanguage("../lang.json")
+	langFilename := fmt.Sprintf("lang.%s.json", cfg.DefaultLanguage)
+	langContent, err := ioutil.ReadFile(langFilename)
+	if err != nil {
+		log.WithError(err).Fatalf("failed to get language file content")
+	}
+	lang, err = golearn.GetLanguage(langContent)
 	if err != nil {
 		log.WithError(err).Fatalf("failed to create language instance: %v", err)
 	}
@@ -54,18 +59,16 @@ func init() {
 }
 
 func TestHandler(t *testing.T) {
-	l := lang["ru"]
-
 	commands := []string{
-		l["main_menu"],
-		l["help"],
-		l["start"],
-		l["next_word"],
-		l["again"],
-		l["settings"],
-		l["mode_picking"],
-		l["mode_picking"],
-		l["show_answer"],
+		lang["main_menu"],
+		lang["help"],
+		lang["start"],
+		lang["next_word"],
+		lang["again"],
+		lang["settings"],
+		lang["mode_picking"],
+		lang["mode_picking"],
+		lang["show_answer"],
 	}
 
 	err := handler.Serve()

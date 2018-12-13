@@ -35,6 +35,6 @@ type Config struct {
 	ColsCount       int
 	API             string
 	Service         golearn.DBService
-	Lang            golearn.Lang
+	Lang            golearn.Language
 	DefaultLanguage string
 }

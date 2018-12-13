@@ -1,0 +1,20 @@
+{
+  "start": "⚡ Start",
+  "help": "❓ Help",
+  "help_message": "Press \"start\" to get new word.",
+  "next_word": "▶ Next Word",
+  "again": "↪ Again",
+  "right": "👍 Right answer! You got +100 points",
+  "wrong": "😿 Wrong!",
+  "welcome": "Учишь новые слова? Отлично!\n\n Бот содержит 3000+ самых популярных корейских слов и выражений.\n\n Также позволяет создавать собственные коллекции слов.",
+  "no_words": "There is no words yet",
+  "main_menu": "/Main Menu",
+  "settings": "/Settings",
+  "settings_icon": "⚙️",
+  "mode_picking": "⚙️ Picking mode",
+  "mode_typing": "⚙️ Typing mode",
+  "mode_explain": "В режиме \"выбора\", вам предлагается 4 варианта ответов из которых вы можете выбрать правильный ответ. В режиме \"ввода\" вам нужно напечатать правильный ответ самостоятельно",
+  "mode_set": "Mode has been set successfully",
+  "right_answer_is": "Right answer is %s",
+  "show_answer": "🤷 Show answer"
+}

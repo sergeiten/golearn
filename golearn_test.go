@@ -1,39 +1,38 @@
 package golearn
 
 import (
+	"fmt"
+	"io/ioutil"
 	"testing"
 )
 
 func TestGetLanguage(t *testing.T) {
-	lang, err := GetLanguage("./no_exists_file_with_such_name_ever_in_this_project")
-	if err == nil {
-		t.Fatalf("error should be not nil for non exists language file")
-	}
+	t.Run("Check language file content test", func(t *testing.T) {
+		codes := []string{"ru", "en"}
 
-	lang, err = GetLanguage("./lang.json")
-	if err != nil {
-		t.Fatalf("failed to get language instance: %v", err)
-	}
+		total := 0
+		for _, code := range codes {
+			langFilename := fmt.Sprintf("./lang.%s.json", code)
+			langContent, err := ioutil.ReadFile(langFilename)
+			if err != nil {
+				t.Fatalf("failed to read language file: %s, %v", langFilename, err)
+			}
+			lang, err := GetLanguage(langContent)
+			if err != nil {
+				t.Fatalf("failed to get language instance: %v", err)
+			}
 
-	codes := []string{"ru", "en"}
+			phrasesLength := len(lang)
 
-	total := 0
-	for _, code := range codes {
-		phrases, ok := lang[code]
-		if !ok {
-			t.Fatalf("failed to get phrases for %s language", code)
+			if phrasesLength == 0 {
+				t.Fatalf("failed to get phrases for %s language", code)
+			}
+
+			total += phrasesLength
 		}
 
-		phrasesLength := len(phrases)
-
-		if phrasesLength == 0 {
-			t.Fatalf("failed to get phrases for %s language", code)
+		if total%len(codes) != 0 {
+			t.Error("language phrases count mismatch, some phrase/phrases missed")
 		}
-
-		total += phrasesLength
-	}
-
-	if total%len(codes) != 0 {
-		t.Error("language phrases count mismatch, some phrase/phrases missed")
-	}
+	})
 }

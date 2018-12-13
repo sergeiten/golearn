@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
@@ -27,7 +28,12 @@ func init() {
 
 func main() {
 	cfg := golearn.ConfigFromEnv()
-	language, err := golearn.GetLanguage("./lang.json")
+	langFilename := fmt.Sprintf("./lang.%s.json", cfg.DefaultLanguage)
+	languageContent, err := ioutil.ReadFile(langFilename)
+	if err != nil {
+		log.WithError(err).Fatal("failed to get language file content")
+	}
+	language, err := golearn.GetLanguage(languageContent)
 	if err != nil {
 		log.WithError(err).Fatal("failed to get language instance")
 	}
