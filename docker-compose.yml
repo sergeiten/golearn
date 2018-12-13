@@ -3,7 +3,7 @@ services:
     app:
         build: 
           context: .
-          dockerfile: ./docker/app/Dockerfile
+          dockerfile: Dockerfile
         image: sergeiten/golearn:v1
         volumes:
           - /tmp:/logs

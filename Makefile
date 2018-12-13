@@ -1,6 +1,6 @@
 GO_PACKAGES=$(shell ls -d */ | grep -v vendor)
 
-default: build
+default: test
 
 build:
 	docker-compose --project-name golearn up --force-recreate --build --remove-orphans -d
@@ -11,3 +11,6 @@ quality:
 	golint -set_exit_status $(go list ./...)
 	megacheck ./...
 	gocyclo -over 12 $(GO_PACKAGES)
+
+test:
+	go test -v -race ./...
