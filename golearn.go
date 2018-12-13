@@ -2,9 +2,9 @@ package golearn
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/pkg/errors"
 )
 
 // ModeTyping constant for user "typing" mode
@@ -59,12 +59,6 @@ type DBService interface {
 	SetUserMode(userID string, mode string) error
 }
 
-// Format ...
-func (f *LogFormatter) Format(entry *log.Entry) ([]byte, error) {
-	t := entry.Time.Format("2006-01-02T15:04:05.999Z07:00")
-	return []byte(fmt.Sprintf("[%s][%s][v1.0.0] %s\n", t, entry.Level.String(), entry.Message)), nil
-}
-
 // GetLanguage returns language object with phrases
 func GetLanguage(content []byte) (Language, error) {
 	var lang = Language{}
@@ -74,4 +68,24 @@ func GetLanguage(content []byte) (Language, error) {
 	}
 
 	return lang, nil
+}
+
+// LogPrint prints error message with stack trace without exited program
+func LogPrint(err error, message string) {
+	if err != nil {
+		log.Printf("%+v", errors.Wrap(err, message))
+	}
+}
+
+func LogPrintf(err error, message string, args ...interface{}) {
+	if err != nil {
+		log.Printf("%+v", errors.Wrapf(err, message, args...))
+	}
+}
+
+// LogFatal prints error message with stack trace with exited program
+func LogFatal(err error, message string) {
+	if err != nil {
+		log.Fatalf("%+v", errors.Wrap(err, message))
+	}
 }

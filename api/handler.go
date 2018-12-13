@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"html"
 	"log"
 	"net/http"
 
@@ -29,8 +28,6 @@ func (h API) Serve() error {
 }
 
 func (h API) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Printf("received %s %s\n", r.Method, html.EscapeString(r.URL.Path))
-
 	if r.Method == http.MethodPost && r.URL.Path == "/api/word" {
 		h.insertWord(w, r)
 		return

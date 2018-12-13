@@ -94,25 +94,24 @@ func (h *Handler) sendMessage(chatID int, message string, reply ReplyMarkup) {
 		log.WithError(err).Print("failed to send request")
 	}
 
-	log.Debugf("POST values: %+v", values)
-
 	defer response.Body.Close()
 }
 
-func (h *Handler) parseUpdate(r *http.Request) TUpdate {
-	var update TUpdate
+func (h *Handler) parseUpdate(r *http.Request) (TUpdate, error) {
+	update := TUpdate{}
 
 	body, err := ioutil.ReadAll(r.Body)
 
 	if err != nil {
-		log.Printf("failed to get body data: %v", err)
+		return update, err
 	}
 
 	defer r.Body.Close()
 
-	if err := json.Unmarshal(body, &update); err != nil {
-		log.Printf("failed to parse parse update json: %v", err)
+	err = json.Unmarshal(body, &update)
+	if err != nil {
+		return update, err
 	}
 
-	return update
+	return update, nil
 }

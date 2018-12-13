@@ -1,12 +1,14 @@
-hash: b45d15585b1471ec0474073ebaad11a47ea54bf3dc307494817e8b2f5b7464c3
-updated: 2018-10-09T11:08:11.615513+09:00
+hash: d35b607d675bd3915eaa31b746ef26968e9eb9a8b34cf8559d58c6cd5ceb51b3
+updated: 2018-12-13T10:54:01.056366+09:00
 imports:
 - name: github.com/go-sql-driver/mysql
-  version: d523deb1b23d913de5bdada721a6071e71283618
+  version: 72cd26f257d44c1114970e19afddcd812016007e
 - name: github.com/konsorten/go-windows-terminal-sequences
   version: 5c8c8bd35d3832f5d134ae1e1e375b69a4d25242
+- name: github.com/pkg/errors
+  version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/sirupsen/logrus
-  version: ad15b42461921f1fb3529b058c6786c6a45d5162
+  version: bcd833dfe83d3cebad139e4a29ed79cb2318bf95
 - name: golang.org/x/crypto
   version: 6a293f2d4b14b8e6d3f0539e383f6d0d30fce3fd
   subpackages:

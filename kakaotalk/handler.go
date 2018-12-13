@@ -3,21 +3,18 @@ package kakaotalk
 import (
 	"encoding/json"
 	"fmt"
-	"html"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"time"
 
 	"github.com/sergeiten/golearn"
-
-	log "github.com/sirupsen/logrus"
 )
 
 // Handler ...
 type Handler struct {
 	service  golearn.DBService
-	lang     golearn.Lang
+	lang     golearn.Language
 	langCode string
 }
 
@@ -38,8 +35,6 @@ func (h *Handler) Serve() error {
 
 // HandleHTTP handle http requests
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Debugf("Received %s %s\n", r.Method, html.EscapeString(r.URL.Path))
-
 	if r.Method == http.MethodGet && r.URL.Path == "/kakaobot/keyboard" {
 		h.keyboard(w, r)
 		return
@@ -54,23 +49,21 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) message(w http.ResponseWriter, r *http.Request) {
 	cmd, err := h.commandFromRequest(r)
 	if err != nil {
-		log.WithError(err).Errorf("failed to unmarshal command")
+		golearn.LogPrint(err, "failed to unmarshal command")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	log.Debugf("Get command from %s user with content %s\n", cmd.UserKey, cmd.Content)
-
 	msg, err := h.prepareMessage(cmd)
 	if err != nil {
-		log.WithError(err).Errorf("failed to handle message %+v: %v", cmd, err)
+		golearn.LogPrintf(err, "failed to handle message %s", cmd)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
 	resp, err := json.Marshal(msg)
 	if err != nil {
-		log.WithError(err).Errorf("failed to marshal message")
+		golearn.LogPrint(err, "failed to marshal message")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -82,13 +75,13 @@ func (h *Handler) message(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) prepareMessage(cmd *command) (*message, error) {
 	switch cmd.Content {
-	case h.lang[h.langCode]["help"]:
+	case h.lang["help"]:
 		return h.handleHelp()
-	case h.lang[h.langCode]["start"]:
+	case h.lang["start"]:
 		return h.handleStart(cmd)
-	case h.lang[h.langCode]["next_word"]:
+	case h.lang["next_word"]:
 		return h.handleStart(cmd)
-	case h.lang[h.langCode]["again"]:
+	case h.lang["again"]:
 		return h.handleAgain(cmd)
 	default:
 		return h.handleCommand(cmd)
@@ -100,14 +93,12 @@ func (h *Handler) commandFromRequest(r *http.Request) (*command, error) {
 
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.WithError(err).Errorf("failed to read response body")
 		return cmd, err
 	}
 	defer r.Body.Close()
 
 	err = json.Unmarshal(data, cmd)
 	if err != nil {
-		log.WithError(err).Errorf("failed to unmarshal command")
 		return cmd, err
 	}
 
@@ -118,12 +109,12 @@ func (h *Handler) keyboard(w http.ResponseWriter, r *http.Request) {
 	resp, err := json.Marshal(&keyboard{
 		Type: typeButtons,
 		Buttons: []string{
-			h.lang[h.langCode]["start"],
-			h.lang[h.langCode]["help"],
+			h.lang["start"],
+			h.lang["help"],
 		},
 	})
 	if err != nil {
-		log.WithError(err).Errorf("failed to marshal keyboard")
+		golearn.LogPrint(err, "failed to marshal keyboard")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -136,11 +127,11 @@ func (h *Handler) keyboard(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) handleHelp() (*message, error) {
 	msg := &message{}
 
-	msg.Message.Text = h.lang[h.langCode]["help_message"]
+	msg.Message.Text = h.lang["help_message"]
 	msg.Keyboard.Type = "buttons"
 	msg.Keyboard.Buttons = []string{
-		h.lang[h.langCode]["start"],
-		h.lang[h.langCode]["help"],
+		h.lang["start"],
+		h.lang["help"],
 	}
 
 	return msg, nil
@@ -197,13 +188,13 @@ func (h *Handler) handleCommand(cmd *command) (*message, error) {
 
 	m.Keyboard.Type = typeButtons
 	m.Keyboard.Buttons = []string{
-		h.lang[h.langCode]["next_word"],
+		h.lang["next_word"],
 	}
 	if isRight {
-		m.Message.Text = h.lang[h.langCode]["right"]
+		m.Message.Text = h.lang["right"]
 	} else {
-		m.Message.Text = h.lang[h.langCode]["wrong"]
-		m.Keyboard.Buttons = append(m.Keyboard.Buttons, h.lang[h.langCode]["again"])
+		m.Message.Text = h.lang["wrong"]
+		m.Keyboard.Buttons = append(m.Keyboard.Buttons, h.lang["again"])
 	}
 
 	return m, nil

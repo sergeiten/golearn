@@ -11,7 +11,6 @@ import (
 
 	"github.com/sergeiten/golearn"
 	"github.com/sergeiten/golearn/mongo"
-	log "github.com/sirupsen/logrus"
 )
 
 var botToken = "644925777:AAEJyzTEOSTCyXdxutKYWTaFA-A3tTPxeTA"
@@ -19,9 +18,6 @@ var handler *Handler
 var lang golearn.Language
 
 func init() {
-	log.SetFormatter(&golearn.LogFormatter{})
-	log.SetLevel(log.Level(5))
-
 	cfg := &golearn.Config{
 		Database: golearn.Database{
 			Host:     "localhost",
@@ -33,20 +29,15 @@ func init() {
 		DefaultLanguage: "ru",
 	}
 
-	langFilename := fmt.Sprintf("lang.%s.json", cfg.DefaultLanguage)
+	langFilename := fmt.Sprintf("../lang.%s.json", cfg.DefaultLanguage)
 	langContent, err := ioutil.ReadFile(langFilename)
-	if err != nil {
-		log.WithError(err).Fatalf("failed to get language file content")
-	}
+	golearn.LogFatal(err, "failed to get language file content")
+
 	lang, err = golearn.GetLanguage(langContent)
-	if err != nil {
-		log.WithError(err).Fatalf("failed to create language instance: %v", err)
-	}
+	golearn.LogFatal(err, "failed to create language instance")
 
 	service, err := mongo.New(cfg)
-	if err != nil {
-		log.WithError(err).Fatalf("failed to create mongodb instance: %v", err)
-	}
+	golearn.LogFatal(err, "failed to create mongodb instance")
 
 	handler = New(Config{
 		Service:         service,

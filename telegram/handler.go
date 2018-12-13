@@ -2,12 +2,10 @@ package telegram
 
 import (
 	"fmt"
-	"html"
 	"net/http"
 	"strconv"
 
 	"github.com/sergeiten/golearn"
-	log "github.com/sirupsen/logrus"
 )
 
 // Handler telegram HTTP handler
@@ -41,15 +39,14 @@ func (h *Handler) Serve() error {
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Debugf("Received %s %s", r.Method, html.EscapeString(r.URL.Path))
-
 	var err error
 
-	update := h.parseUpdate(r)
+	update, err := h.parseUpdate(r)
+	golearn.LogPrint(err, "failed to parse update")
 
 	h.user, err = h.getOrCreateUser(update)
 	if err != nil {
-		log.Printf("failed to get/create user: %v", err)
+		golearn.LogPrint(err, "failed to get/create user")
 		return
 	}
 
@@ -78,10 +75,10 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		log.Printf("failed to make %s command: %v", update.Message.Text, err)
+		golearn.LogPrintf(err, "failed to handle %s command", update.Message.Text)
 		_, err = fmt.Fprint(w, err.Error())
 		if err != nil {
-			log.Printf("failed to send response: %v", err)
+			golearn.LogPrint(err, "failed to send response")
 		}
 		return
 	}
@@ -89,9 +86,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "plain/text")
 	_, err = fmt.Fprint(w, "OK")
-	if err != nil {
-		log.Printf("failed to send response: %v", err)
-	}
+	golearn.LogPrint(err, "failed to send response")
 }
 
 func (h *Handler) getOrCreateUser(update TUpdate) (golearn.User, error) {
