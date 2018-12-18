@@ -111,7 +111,7 @@ func TestGetOrCreateUser(t *testing.T) {
 
 			handler = New(HandlerConfig{
 				DBService:       dbService,
-				HttpService:     httpService,
+				HTTPService:     httpService,
 				Lang:            lang,
 				DefaultLanguage: "ru",
 				Token:           botToken,
@@ -145,7 +145,7 @@ func TestSettings(t *testing.T) {
 
 	handler = New(HandlerConfig{
 		DBService:       dbService,
-		HttpService:     httpService,
+		HTTPService:     httpService,
 		Lang:            lang,
 		DefaultLanguage: "ru",
 		Token:           botToken,
@@ -228,7 +228,7 @@ func TestSetMode(t *testing.T) {
 
 			handler = New(HandlerConfig{
 				DBService:       dbService,
-				HttpService:     httpService,
+				HTTPService:     httpService,
 				Lang:            lang,
 				DefaultLanguage: "ru",
 				Token:           botToken,

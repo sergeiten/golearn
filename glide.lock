@@ -1,23 +1,27 @@
-hash: d35b607d675bd3915eaa31b746ef26968e9eb9a8b34cf8559d58c6cd5ceb51b3
-updated: 2018-12-13T10:54:01.056366+09:00
+hash: 6fc90586ad405839f29e9f3ca844997110d6152b2a36d075b5d9acf9a5ea46f9
+updated: 2018-12-18T15:35:23.965632+09:00
 imports:
+- name: github.com/davecgh/go-spew
+  version: d8f796af33cc11cb798c1aaeb27a4ebc5099927d
+  subpackages:
+  - spew
 - name: github.com/go-sql-driver/mysql
   version: 72cd26f257d44c1114970e19afddcd812016007e
-- name: github.com/konsorten/go-windows-terminal-sequences
-  version: 5c8c8bd35d3832f5d134ae1e1e375b69a4d25242
 - name: github.com/pkg/errors
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
+- name: github.com/pmezard/go-difflib
+  version: 792786c7400a136282c1664665ae0a8db921c6c2
+  subpackages:
+  - difflib
 - name: github.com/sirupsen/logrus
   version: bcd833dfe83d3cebad139e4a29ed79cb2318bf95
-- name: golang.org/x/crypto
-  version: 6a293f2d4b14b8e6d3f0539e383f6d0d30fce3fd
+- name: github.com/stretchr/objx
+  version: ef50b0de28773081167c97fc27cf29a0bf8b8c71
+- name: github.com/stretchr/testify
+  version: f35b8ab0b5a2cef36673838d662e249dd9c94686
   subpackages:
-  - ssh/terminal
-- name: golang.org/x/sys
-  version: 1e2299c37cc91a509f1b12369872d27be0ce98a6
-  subpackages:
-  - unix
-  - windows
+  - assert
+  - mock
 - name: google.golang.org/appengine
   version: ae0ab99deb4dc413a2b4bd6c8bdd0eb67f1e4d06
   subpackages:

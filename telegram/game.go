@@ -1,7 +1,6 @@
 package telegram
 
 import (
-	"errors"
 	"fmt"
 	"math"
 	"math/rand"
@@ -17,7 +16,7 @@ func (h *Handler) start(update *golearn.Update) (message string, markup ReplyMar
 	case golearn.ModeTyping:
 		return h.startWithTypingMode(update)
 	default:
-		return "", ReplyMarkup{}, errors.New(fmt.Sprintf("failed to start, undefined mode for user: %v", h.user))
+		return "", ReplyMarkup{}, fmt.Errorf("failed to start, undefined mode for user: %v", h.user)
 	}
 }
 

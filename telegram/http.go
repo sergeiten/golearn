@@ -11,24 +11,28 @@ import (
 	"github.com/sergeiten/golearn"
 )
 
-type Http struct {
+// HTTP structs implements HTTPService interface for telegram.
+type HTTP struct {
 	api   string
 	token string
 }
 
-type HttpConfig struct {
-	Api   string
+// HTTPConfig config for making HTTP instance.
+type HTTPConfig struct {
+	API   string
 	Token string
 }
 
-func NewHttp(config HttpConfig) *Http {
-	return &Http{
-		api:   config.Api,
+// NewHTTP returns HTTP instance.
+func NewHTTP(config HTTPConfig) *HTTP {
+	return &HTTP{
+		api:   config.API,
 		token: config.Token,
 	}
 }
 
-func (h *Http) Send(update *golearn.Update, message string, keyboard string) error {
+// Send sends passed message and keyboard struct to the client.
+func (h *HTTP) Send(update *golearn.Update, message string, keyboard string) error {
 	client := &http.Client{}
 	values := url.Values{}
 
@@ -56,7 +60,8 @@ func (h *Http) Send(update *golearn.Update, message string, keyboard string) err
 	return nil
 }
 
-func (h *Http) Parse(r *http.Request) (*golearn.Update, error) {
+// Parse parses passed http request and returns general golearn.Update object.
+func (h *HTTP) Parse(r *http.Request) (*golearn.Update, error) {
 	body, err := ioutil.ReadAll(r.Body)
 
 	if err != nil {

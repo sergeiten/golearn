@@ -71,8 +71,8 @@ type DBService interface {
 	Close()
 }
 
-// HttpService ...
-type HttpService interface {
+// HTTPService represents interface for dealing with sending and parsing http requests
+type HTTPService interface {
 	Send(update *Update, message string, keyboard string) error
 	Parse(r *http.Request) (*Update, error)
 }
@@ -88,20 +88,22 @@ func GetLanguage(content []byte) (Language, error) {
 	return lang, nil
 }
 
-// LogPrint prints error message with stack trace without exited program
+// LogPrint prints error message with stack trace without exited program.
 func LogPrint(err error, message string) {
 	if err != nil {
 		log.Printf("%+v", errors.Wrap(err, message))
 	}
 }
 
+// LogPrintf prints error message with stach trace.
+// Arguments are handled in the manner of fmt.Printf.
 func LogPrintf(err error, message string, args ...interface{}) {
 	if err != nil {
 		log.Printf("%+v", errors.Wrapf(err, message, args...))
 	}
 }
 
-// LogFatal prints error message with stack trace with exited program
+// LogFatal prints error message with stack trace with exited program.
 func LogFatal(err error, message string) {
 	if err != nil {
 		log.Fatalf("%+v", errors.Wrap(err, message))

@@ -36,8 +36,8 @@ func main() {
 	golearn.LogFatal(err, "failed to create mongodb instance")
 	defer service.Close()
 
-	telegramHttp := telegram.NewHttp(telegram.HttpConfig{
-		Api:   os.Getenv("TELEGRAM_BOT_TOKEN"),
+	telegramHTTP := telegram.NewHTTP(telegram.HTTPConfig{
+		API:   os.Getenv("TELEGRAM_BOT_TOKEN"),
 		Token: os.Getenv("TELEGRAM_BOT_TOKEN"),
 	})
 
@@ -49,7 +49,7 @@ func main() {
 
 	err = telegram.New(telegram.HandlerConfig{
 		DBService:       service,
-		HttpService:     telegramHttp,
+		HTTPService:     telegramHTTP,
 		Lang:            language,
 		DefaultLanguage: cfg.DefaultLanguage,
 		Token:           os.Getenv("TELEGRAM_BOT_TOKEN"),

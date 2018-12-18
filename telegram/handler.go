@@ -11,7 +11,7 @@ import (
 // Handler telegram HTTP handler
 type Handler struct {
 	db       golearn.DBService
-	http     golearn.HttpService
+	http     golearn.HTTPService
 	lang     golearn.Language
 	langCode string
 	cols     int
@@ -22,7 +22,7 @@ type Handler struct {
 // HandlerConfig handler config
 type HandlerConfig struct {
 	DBService       golearn.DBService
-	HttpService     golearn.HttpService
+	HTTPService     golearn.HTTPService
 	Lang            golearn.Language
 	DefaultLanguage string
 	Token           string
@@ -33,7 +33,7 @@ type HandlerConfig struct {
 func New(cfg HandlerConfig) *Handler {
 	return &Handler{
 		db:       cfg.DBService,
-		http:     cfg.HttpService,
+		http:     cfg.HTTPService,
 		lang:     cfg.Lang,
 		langCode: cfg.DefaultLanguage,
 		cols:     cfg.ColsCount,
