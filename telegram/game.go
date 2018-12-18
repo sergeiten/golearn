@@ -1,44 +1,39 @@
 package telegram
 
 import (
+	"errors"
 	"fmt"
-	"log"
 	"math"
 	"math/rand"
-	"strconv"
 	"time"
 
 	"github.com/sergeiten/golearn"
 )
 
-func (h *Handler) start(update TUpdate) error {
+func (h *Handler) start(update *golearn.Update) (message string, markup ReplyMarkup, err error) {
 	switch h.user.Mode {
 	case golearn.ModePicking:
 		return h.startWithPickingMode(update)
 	case golearn.ModeTyping:
 		return h.startWithTypingMode(update)
 	default:
-		log.Printf("failed to start, undefined mode for user: %v", h.user)
-		h.sendWelcomeMessage(update)
+		return "", ReplyMarkup{}, errors.New(fmt.Sprintf("failed to start, undefined mode for user: %v", h.user))
 	}
-
-	return nil
 }
 
-func (h *Handler) startWithPickingMode(update TUpdate) error {
-	question, err := h.service.RandomQuestion()
+func (h *Handler) startWithPickingMode(update *golearn.Update) (message string, markup ReplyMarkup, err error) {
+	question, err := h.db.RandomQuestion()
 	if err != nil {
-		return err
+		return "", ReplyMarkup{}, err
 	}
 
-	answers, err := h.service.RandomAnswers(question, 4)
+	answers, err := h.db.RandomAnswers(question, 4)
 	if err != nil {
-		return err
+		return "", ReplyMarkup{}, err
 	}
 
 	if len(answers) == 0 {
-		h.sendMessage(update.Message.Chat.ID, h.lang["no_words"], ReplyMarkup{})
-		return nil
+		return h.lang["no_words"], ReplyMarkup{}, nil
 	}
 
 	// shuffle answers
@@ -52,39 +47,37 @@ func (h *Handler) startWithPickingMode(update TUpdate) error {
 
 	// save state
 	s := golearn.State{
-		UserKey:   strconv.Itoa(update.Message.Chat.ID),
+		UserKey:   update.UserID,
 		Question:  question,
 		Answers:   shuffledAnswers,
 		Timestamp: time.Now().Unix(),
 	}
 
-	err = h.service.SetState(s)
+	err = h.db.SetState(s)
 	if err != nil {
-		return err
+		return "", ReplyMarkup{}, err
 	}
 
-	h.sendMessage(update.Message.Chat.ID, question.Word, keyboard)
-
-	return nil
+	return question.Word, keyboard, nil
 }
 
-func (h *Handler) startWithTypingMode(update TUpdate) error {
-	question, err := h.service.RandomQuestion()
+func (h *Handler) startWithTypingMode(update *golearn.Update) (message string, markup ReplyMarkup, err error) {
+	question, err := h.db.RandomQuestion()
 	if err != nil {
-		return err
+		return "", ReplyMarkup{}, err
 	}
 
 	// save state
 	s := golearn.State{
-		UserKey:   strconv.Itoa(update.Message.Chat.ID),
+		UserKey:   update.UserID,
 		Question:  question,
 		Answers:   []golearn.Row{},
 		Timestamp: time.Now().Unix(),
 	}
 
-	err = h.service.SetState(s)
+	err = h.db.SetState(s)
 	if err != nil {
-		return err
+		return "", ReplyMarkup{}, err
 	}
 
 	keyboard := ReplyMarkup{
@@ -98,31 +91,29 @@ func (h *Handler) startWithTypingMode(update TUpdate) error {
 		true,
 	}
 
-	h.sendMessage(update.Message.Chat.ID, question.Translate, keyboard)
-
-	return nil
+	return question.Translate, keyboard, nil
 }
 
-func (h *Handler) answer(update TUpdate) error {
-	var reply ReplyMarkup
+func (h *Handler) answer(update *golearn.Update) (message string, markup ReplyMarkup, err error) {
 
-	state, err := h.service.GetState(strconv.Itoa(update.Message.Chat.ID))
+	state, err := h.db.GetState(update.UserID)
 	if err != nil {
-		return err
+		return "", ReplyMarkup{}, err
 	}
 
+	var keyboard ReplyMarkup
 	isRight := h.isAnswerRight(state, update)
 
-	reply.ResizeKeyboard = true
-	reply.Keyboard = [][]string{
+	keyboard.ResizeKeyboard = true
+	keyboard.Keyboard = [][]string{
 		{h.lang["next_word"]},
 	}
-	message := h.lang["right"]
+	message = h.lang["right"]
 	if !isRight {
 		message = h.lang["wrong"]
 
 		if h.user.Mode == golearn.ModePicking {
-			reply.Keyboard = append(reply.Keyboard, []string{h.lang["again"]})
+			keyboard.Keyboard = append(keyboard.Keyboard, []string{h.lang["again"]})
 		}
 
 		if h.user.Mode == golearn.ModeTyping {
@@ -130,15 +121,13 @@ func (h *Handler) answer(update TUpdate) error {
 		}
 	}
 
-	h.sendMessage(update.Message.Chat.ID, message, reply)
-
-	return nil
+	return message, keyboard, nil
 }
 
-func (h *Handler) showAnswer(update TUpdate) error {
-	state, err := h.service.GetState(strconv.Itoa(update.Message.Chat.ID))
+func (h *Handler) showAnswer(update *golearn.Update) (message string, markup ReplyMarkup, err error) {
+	state, err := h.db.GetState(update.UserID)
 	if err != nil {
-		return err
+		return "", ReplyMarkup{}, err
 	}
 
 	keyboard := ReplyMarkup{
@@ -151,38 +140,33 @@ func (h *Handler) showAnswer(update TUpdate) error {
 		true,
 	}
 
-	message := fmt.Sprintf(h.lang["right_answer_is"], state.Question.Word)
+	message = fmt.Sprintf(h.lang["right_answer_is"], state.Question.Word)
 
-	h.sendMessage(update.Message.Chat.ID, message, keyboard)
-
-	return nil
+	return message, keyboard, nil
 }
 
-func (h *Handler) isAnswerRight(state golearn.State, update TUpdate) bool {
+func (h *Handler) isAnswerRight(state golearn.State, update *golearn.Update) bool {
 	toCompare := state.Question.Translate
 	if h.user.Mode == golearn.ModeTyping {
 		toCompare = state.Question.Word
 	}
-	return toCompare == update.Message.Text
+	return toCompare == update.Message
 }
 
-func (h *Handler) again(update TUpdate) error {
-	var reply ReplyMarkup
-
-	state, err := h.service.GetState(strconv.Itoa(update.Message.Chat.ID))
+func (h *Handler) again(update *golearn.Update) (message string, markup ReplyMarkup, err error) {
+	state, err := h.db.GetState(update.UserID)
 	if err != nil {
-		return err
+		return "", ReplyMarkup{}, err
 	}
 
-	reply.ResizeKeyboard = true
+	var keyboard ReplyMarkup
+	keyboard.ResizeKeyboard = true
 
 	for _, b := range state.Answers {
-		reply.Keyboard = append(reply.Keyboard, []string{b.Translate})
+		keyboard.Keyboard = append(keyboard.Keyboard, []string{b.Translate})
 	}
 
-	h.sendMessage(update.Message.Chat.ID, state.Question.Word, reply)
-
-	return nil
+	return state.Question.Word, keyboard, nil
 }
 
 func (h *Handler) replyKeyboardWithAnswers(answers []golearn.Row) ReplyMarkup {

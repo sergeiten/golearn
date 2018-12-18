@@ -1,33 +1,43 @@
 package telegram
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/sergeiten/golearn"
 )
 
 // Handler telegram HTTP handler
 type Handler struct {
-	service  golearn.DBService
+	db       golearn.DBService
+	http     golearn.HttpService
 	lang     golearn.Language
 	langCode string
-	token    string
-	api      string
 	cols     int
+	token    string
 	user     golearn.User
 }
 
+// HandlerConfig handler config
+type HandlerConfig struct {
+	DBService       golearn.DBService
+	HttpService     golearn.HttpService
+	Lang            golearn.Language
+	DefaultLanguage string
+	Token           string
+	ColsCount       int
+}
+
 // New returns new instance of telegram hanlder
-func New(cfg Config) *Handler {
+func New(cfg HandlerConfig) *Handler {
 	return &Handler{
-		service:  cfg.Service,
+		db:       cfg.DBService,
+		http:     cfg.HttpService,
 		lang:     cfg.Lang,
 		langCode: cfg.DefaultLanguage,
-		token:    cfg.Token,
-		api:      cfg.API,
 		cols:     cfg.ColsCount,
+		token:    cfg.Token,
 	}
 }
 
@@ -40,8 +50,10 @@ func (h *Handler) Serve() error {
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var err error
+	var message string
+	var keyboard ReplyMarkup
 
-	update, err := h.parseUpdate(r)
+	update, err := h.http.Parse(r)
 	golearn.LogPrint(err, "failed to parse update")
 
 	h.user, err = h.getOrCreateUser(update)
@@ -50,37 +62,45 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	switch update.Message.Text {
+	switch update.Message {
 	case h.lang["main_menu"]:
-		err = h.mainMenu(update)
+		message, keyboard, err = h.main(update)
 	case h.lang["help"]:
-		err = h.help(update)
+		message, keyboard, err = h.help(update)
 	case h.lang["start"]:
-		h.sendWelcomeMessage(update)
-		err = h.start(update)
+		message, keyboard, err = h.start(update)
 	case h.lang["next_word"]:
-		err = h.start(update)
+		message, keyboard, err = h.start(update)
 	case h.lang["again"]:
-		err = h.again(update)
+		message, keyboard, err = h.again(update)
 	case h.lang["settings"]:
-		err = h.settings(update)
+		message, keyboard, err = h.settings(update)
 	case h.lang["mode_picking"]:
-		err = h.setMode(update, golearn.ModePicking)
+		message, keyboard, err = h.setMode(golearn.ModePicking)
 	case h.lang["mode_typing"]:
-		err = h.setMode(update, golearn.ModeTyping)
+		message, keyboard, err = h.setMode(golearn.ModeTyping)
 	case h.lang["show_answer"]:
-		err = h.showAnswer(update)
+		message, keyboard, err = h.showAnswer(update)
 	default:
-		err = h.answer(update)
+		message, keyboard, err = h.answer(update)
 	}
 
 	if err != nil {
-		golearn.LogPrintf(err, "failed to handle %s command", update.Message.Text)
+		golearn.LogPrintf(err, "failed to handle %s command", update.Message)
 		_, err = fmt.Fprint(w, err.Error())
-		if err != nil {
-			golearn.LogPrint(err, "failed to send response")
-		}
+		golearn.LogPrint(err, "failed to send response")
 		return
+	}
+
+	d, err := json.Marshal(keyboard)
+	if err != nil {
+		golearn.LogPrint(err, "failed to marshal reply keyboard")
+		return
+	}
+
+	err = h.http.Send(update, message, string(d))
+	if err != nil {
+		golearn.LogPrint(err, "failed to send message")
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -89,28 +109,28 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	golearn.LogPrint(err, "failed to send response")
 }
 
-func (h *Handler) getOrCreateUser(update TUpdate) (golearn.User, error) {
+func (h *Handler) getOrCreateUser(update *golearn.Update) (golearn.User, error) {
 	u := golearn.User{
-		UserID:   strconv.Itoa(update.Message.Chat.ID),
-		Username: update.Message.Chat.Username,
-		Name:     update.Message.Chat.Firstname,
+		UserID:   update.UserID,
+		Username: update.Username,
+		Name:     update.Name,
 		Mode:     golearn.ModePicking,
 	}
 
-	exist, err := h.service.ExistUser(u)
+	exist, err := h.db.ExistUser(u)
 	if err != nil {
 		return u, err
 	}
 
 	if exist {
-		return h.service.GetUser(u.UserID)
+		return h.db.GetUser(u.UserID)
 	}
 
-	return u, h.service.InsertUser(u)
+	return u, h.db.InsertUser(u)
 }
 
-func (h *Handler) settings(update TUpdate) error {
-	reply := ReplyMarkup{
+func (h *Handler) settings(update *golearn.Update) (message string, markup ReplyMarkup, err error) {
+	keyboard := ReplyMarkup{
 		Keyboard: [][]string{
 			{
 				h.lang["mode_picking"],
@@ -120,20 +140,16 @@ func (h *Handler) settings(update TUpdate) error {
 		ResizeKeyboard: true,
 	}
 
-	h.sendMessage(update.Message.Chat.ID, h.lang["mode_explain"], reply)
-
-	return nil
+	return h.lang["mode_explain"], keyboard, nil
 }
 
-func (h *Handler) setMode(update TUpdate, mode string) error {
-	err := h.service.SetUserMode(h.user.UserID, mode)
+func (h *Handler) setMode(mode string) (message string, markup ReplyMarkup, err error) {
+	err = h.db.SetUserMode(h.user.UserID, mode)
 	if err != nil {
-		return err
+		return "", ReplyMarkup{}, err
 	}
 
-	reply := h.mainMenuKeyboard()
+	keyboard := h.mainMenuKeyboard()
 
-	h.sendMessage(update.Message.Chat.ID, h.lang["mode_set"], reply)
-
-	return nil
+	return h.lang["mode_set"], keyboard, nil
 }

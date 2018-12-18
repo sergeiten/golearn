@@ -1,6 +1,7 @@
 package mongo
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"time"
@@ -15,14 +16,14 @@ type Service struct {
 	session *mgo.Session
 }
 
-// New returns new instance of service
-func New(cfg *golearn.Config) (golearn.DBService, error) {
+// New returns new instance of mockService
+func New(cfg *golearn.Config) (*Service, error) {
 	session, err := newSession(cfg)
 	if err != nil {
 		return nil, err
 	}
 
-	return Service{
+	return &Service{
 		session: session,
 	}, nil
 }
@@ -41,7 +42,7 @@ func newSession(cfg *golearn.Config) (*mgo.Session, error) {
 	return session, nil
 }
 
-// Close terminates the service session
+// Close terminates the mockService session
 func (s Service) Close() {
 	s.session.Close()
 }
@@ -122,14 +123,20 @@ func (s Service) UpdateUser(user golearn.User) error {
 
 // ExistUser returns bool if user already exists in db
 func (s Service) ExistUser(user golearn.User) (bool, error) {
+	if user.UserID == "" {
+		return false, errors.New("passed user has empty id")
+	}
 	count, err := s.session.DB("golearn").C("users").Find(bson.M{"userid": user.UserID}).Count()
 	return count > 0, err
 }
 
 // GetUser returns user from db
-func (s Service) GetUser(userid string) (golearn.User, error) {
+func (s Service) GetUser(id string) (golearn.User, error) {
 	u := golearn.User{}
-	err := s.session.DB("golearn").C("users").Find(bson.M{"userid": userid}).One(&u)
+	if id == "" {
+		return u, errors.New("passed user id is empty")
+	}
+	err := s.session.DB("golearn").C("users").Find(bson.M{"id": id}).One(&u)
 
 	return u, err
 }

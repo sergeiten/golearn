@@ -1,7 +1,5 @@
 package telegram
 
-import "github.com/sergeiten/golearn"
-
 // TUpdate ...
 type TUpdate struct {
 	UpdateID int      `json:"update_id"`
@@ -27,14 +25,4 @@ type TChat struct {
 type ReplyMarkup struct {
 	Keyboard       [][]string `json:"keyboard"`
 	ResizeKeyboard bool       `json:"resize_keyboard"`
-}
-
-// Config ...
-type Config struct {
-	Token           string
-	ColsCount       int
-	API             string
-	Service         golearn.DBService
-	Lang            golearn.Language
-	DefaultLanguage string
 }

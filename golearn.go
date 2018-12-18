@@ -3,6 +3,7 @@ package golearn
 import (
 	"encoding/json"
 	"log"
+	"net/http"
 
 	"github.com/pkg/errors"
 )
@@ -34,6 +35,16 @@ type User struct {
 	Mode     string
 }
 
+// Update represents joint response data model from service (telegram, kakaotalk).
+// Contains minimal required data for detecting user and sending message back.
+type Update struct {
+	ChatID   string
+	UserID   string
+	Username string
+	Name     string
+	Message  string
+}
+
 // State represents last user state by saving question and answers in db.
 // When user answers we get last state and compare text user send with state answer
 type State struct {
@@ -58,6 +69,12 @@ type DBService interface {
 	GetUser(userid string) (User, error)
 	SetUserMode(userID string, mode string) error
 	Close()
+}
+
+// HttpService ...
+type HttpService interface {
+	Send(update *Update, message string, keyboard string) error
+	Parse(r *http.Request) (*Update, error)
 }
 
 // GetLanguage returns language object with phrases
