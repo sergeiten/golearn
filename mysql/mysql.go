@@ -9,11 +9,12 @@ import (
 	"github.com/sergeiten/golearn"
 )
 
+// DBService mysql database struct.
 type DBService struct {
 	DB *sql.DB
 }
 
-// Open returns opened mysql connection object
+// Open returns opened mysql connection object.
 func Open(connection string) (*sql.DB, error) {
 	db, err := sql.Open("mysql", connection)
 	if err != nil {
@@ -22,7 +23,7 @@ func Open(connection string) (*sql.DB, error) {
 	return db, nil
 }
 
-// Exists returns boolean if row exists in table
+// Exists returns boolean if row exists in table.
 func Exists(DB *sql.DB, sql string, args []interface{}) bool {
 	var exists bool
 
@@ -37,6 +38,7 @@ func Exists(DB *sql.DB, sql string, args []interface{}) bool {
 	return exists
 }
 
+// RandomRow returns random row from database.
 func (s *DBService) RandomRow() (golearn.Row, error) {
 	q := golearn.Row{}
 
@@ -45,6 +47,7 @@ func (s *DBService) RandomRow() (golearn.Row, error) {
 	return q, nil
 }
 
+// RandomAnswers returns list of random rows for building answer options.
 func (s *DBService) RandomAnswers(q golearn.Row, limit int) ([]golearn.Row, error) {
 	fmt.Printf("%+v", q)
 	answers := []golearn.Row{}
@@ -74,14 +77,17 @@ func (s *DBService) RandomAnswers(q golearn.Row, limit int) ([]golearn.Row, erro
 	return answers, nil
 }
 
+// SetState sets state.
 func (s *DBService) SetState(state golearn.State) error {
 	return nil
 }
 
+// GetState returns state by passed user id.
 func (s *DBService) GetState(userKey string) (golearn.State, error) {
 	return golearn.State{}, nil
 }
 
+// ResetState resets state by passed user id.
 func (s *DBService) ResetState(userKey string) error {
 	if userKey == "" {
 		return errors.New("user key is empty")

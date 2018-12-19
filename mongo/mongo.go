@@ -141,6 +141,7 @@ func (s Service) GetUser(id string) (golearn.User, error) {
 	return u, err
 }
 
+// SetUserMode sets new mode for passed user id
 func (s Service) SetUserMode(userid string, mode string) error {
 	return s.session.DB("golearn").C("users").Update(bson.M{"userid": userid}, bson.M{
 		"$set": bson.M{

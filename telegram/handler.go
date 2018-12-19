@@ -29,7 +29,7 @@ type HandlerConfig struct {
 	ColsCount       int
 }
 
-// New returns new instance of telegram hanlder
+// New returns new instance of telegram handler
 func New(cfg HandlerConfig) *Handler {
 	return &Handler{
 		db:       cfg.DBService,
