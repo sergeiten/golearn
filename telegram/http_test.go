@@ -2,7 +2,7 @@ package telegram
 
 import (
 	"encoding/json"
-	"net/http/httptest"
+	"net/http"
 	"strings"
 	"testing"
 
@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHttp_Parse(t *testing.T) {
+func TestParse(t *testing.T) {
 	httpService := &mocks.HttpService{}
 
 	update := TUpdate{
@@ -38,7 +38,7 @@ func TestHttp_Parse(t *testing.T) {
 
 	d, _ := json.Marshal(update)
 
-	req := httptest.NewRequest("POST", "/", strings.NewReader(string(d)))
+	req, _ := http.NewRequest("POST", "/", strings.NewReader(string(d)))
 
 	httpService.On("Parse", req).Return(expectedUpdate, nil)
 

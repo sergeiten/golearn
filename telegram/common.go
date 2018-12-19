@@ -17,7 +17,7 @@ func (h *Handler) mainMenuKeyboard() ReplyMarkup {
 	}
 }
 
-func (h *Handler) main(update *golearn.Update) (message string, markup ReplyMarkup, err error) {
+func (h *Handler) mainMenu(update *golearn.Update) (message string, markup ReplyMarkup, err error) {
 	keyboard := h.mainMenuKeyboard()
 
 	return h.lang["welcome"], keyboard, nil

@@ -1,7 +1,6 @@
 package telegram
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -250,18 +249,40 @@ func TestSetMode(t *testing.T) {
 	}
 }
 
-//func TestHandler(t *testing.T) {
-//	commands := []string{
-//		lang["main_menu"],
-//		//lang["help"],
-//		//lang["start"],
-//		//lang["next_word"],
-//		//lang["again"],
-//		//lang["settings"],
-//		//lang["mode_picking"],
-//		//lang["mode_picking"],
-//		//lang["show_answer"],
+//func TestHandle(t *testing.T) {
+//	testCases := []struct {
+//		Command string
+//		Message string
+//		Markup  ReplyMarkup
+//		Error   error
+//	}{
+//		{
+//			Command: lang["main_menu"],
+//			Message: lang["welcome"],
+//			Markup: ReplyMarkup{
+//				Keyboard: [][]string{
+//					{
+//						lang["start"],
+//						lang["settings"],
+//						lang["help"],
+//					},
+//				},
+//				ResizeKeyboard: true,
+//			},
+//			Error: nil,
+//		},
 //	}
+//	//commands := []string{
+//	//lang["main_menu"],
+//	//lang["help"],
+//	//lang["start"],
+//	//lang["next_word"],
+//	//lang["again"],
+//	//lang["settings"],
+//	//lang["mode_picking"],
+//	//lang["mode_picking"],
+//	//lang["show_answer"],
+//	//}
 //
 //	err := handler.Serve()
 //	if err != nil {
@@ -312,37 +333,3 @@ func TestSetMode(t *testing.T) {
 //		assert.Equal(t, "OK", resp)
 //	}
 //}
-
-func TestReplyKeyboardWithAnswers(t *testing.T) {
-	expectedString := `{"keyboard":[["test0","test1"],["test2","test3"],["/Главное Меню"]],"resize_keyboard":true}`
-
-	words := []golearn.Row{
-		{
-			Word:      "test0",
-			Translate: "test0",
-		}, {
-			Word:      "test1",
-			Translate: "test1",
-		},
-		{
-			Word:      "test2",
-			Translate: "test2",
-		}, {
-			Word:      "test3",
-			Translate: "test3",
-		},
-	}
-
-	reply := handler.replyKeyboardWithAnswers(words)
-
-	byt, err := json.Marshal(reply)
-	if err != nil {
-		t.Fatal("failed to unmarshal reply")
-	}
-
-	json := string(byt)
-
-	if expectedString != json {
-		t.Errorf("reply keyboard failed, expected: %s, got: %s", expectedString, json)
-	}
-}

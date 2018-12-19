@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -26,7 +27,7 @@ func init() {
 func main() {
 	cfg := golearn.ConfigFromEnv()
 	langFilename := fmt.Sprintf("./lang.%s.json", cfg.DefaultLanguage)
-	languageContent, err := ioutil.ReadFile(langFilename)
+	languageContent, err := ioutil.ReadFile(filepath.Clean(langFilename))
 	golearn.LogFatal(err, "failed to get language file content")
 
 	language, err := golearn.GetLanguage(languageContent)
@@ -55,9 +56,8 @@ func main() {
 		Token:           os.Getenv("TELEGRAM_BOT_TOKEN"),
 		ColsCount:       cols,
 	}).Serve()
-	if err != nil {
-		log.Fatalf("failed to start handler: %v", err)
-	}
+
+	golearn.LogFatal(err, "failed to start handler")
 
 	err = api.New(service).Serve()
 	golearn.LogFatal(err, "failed to start serving telegram handler")

@@ -94,7 +94,6 @@ func (h *Handler) startWithTypingMode(update *golearn.Update) (message string, m
 }
 
 func (h *Handler) answer(update *golearn.Update) (message string, markup ReplyMarkup, err error) {
-
 	state, err := h.db.GetState(update.UserID)
 	if err != nil {
 		return "", ReplyMarkup{}, err
@@ -158,7 +157,7 @@ func (h *Handler) again(update *golearn.Update) (message string, markup ReplyMar
 		return "", ReplyMarkup{}, err
 	}
 
-	var keyboard ReplyMarkup
+	keyboard := ReplyMarkup{}
 	keyboard.ResizeKeyboard = true
 
 	for _, b := range state.Answers {

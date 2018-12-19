@@ -49,10 +49,6 @@ func (h *Handler) Serve() error {
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var err error
-	var message string
-	var keyboard ReplyMarkup
-
 	update, err := h.http.Parse(r)
 	golearn.LogPrint(err, "failed to parse update")
 
@@ -62,28 +58,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	switch update.Message {
-	case h.lang["main_menu"]:
-		message, keyboard, err = h.main(update)
-	case h.lang["help"]:
-		message, keyboard, err = h.help(update)
-	case h.lang["start"]:
-		message, keyboard, err = h.start(update)
-	case h.lang["next_word"]:
-		message, keyboard, err = h.start(update)
-	case h.lang["again"]:
-		message, keyboard, err = h.again(update)
-	case h.lang["settings"]:
-		message, keyboard, err = h.settings(update)
-	case h.lang["mode_picking"]:
-		message, keyboard, err = h.setMode(golearn.ModePicking)
-	case h.lang["mode_typing"]:
-		message, keyboard, err = h.setMode(golearn.ModeTyping)
-	case h.lang["show_answer"]:
-		message, keyboard, err = h.showAnswer(update)
-	default:
-		message, keyboard, err = h.answer(update)
-	}
+	message, keyboard, err := h.handle(update)
 
 	if err != nil {
 		golearn.LogPrintf(err, "failed to handle %s command", update.Message)
@@ -107,6 +82,31 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "plain/text")
 	_, err = fmt.Fprint(w, "OK")
 	golearn.LogPrint(err, "failed to send response")
+}
+
+func (h *Handler) handle(update *golearn.Update) (string, ReplyMarkup, error) {
+	switch update.Message {
+	case h.lang["main_menu"]:
+		return h.mainMenu(update)
+	case h.lang["help"]:
+		return h.help(update)
+	case h.lang["start"]:
+		return h.start(update)
+	case h.lang["next_word"]:
+		return h.start(update)
+	case h.lang["again"]:
+		return h.again(update)
+	case h.lang["settings"]:
+		return h.settings(update)
+	case h.lang["mode_picking"]:
+		return h.setMode(golearn.ModePicking)
+	case h.lang["mode_typing"]:
+		return h.setMode(golearn.ModeTyping)
+	case h.lang["show_answer"]:
+		return h.showAnswer(update)
+	default:
+		return h.answer(update)
+	}
 }
 
 func (h *Handler) getOrCreateUser(update *golearn.Update) (golearn.User, error) {
