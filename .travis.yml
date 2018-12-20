@@ -1,17 +1,14 @@
 language: go
 go:
-  - 1.10.x
-  - 1.11.x
-
+- 1.10.x
+- 1.11.x
 install:
-  - go get golang.org/x/tools/cmd/cover
-  - go get github.com/mattn/goveralls
-
+- go get golang.org/x/tools/cmd/cover
+- go get github.com/mattn/goveralls
 script:
-  - go test -v -covermode=count -coverprofile=coverage.out
-  - $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
-  - go test -v -race ./...
-
+- go test -v -race -covermode=count -coverprofile=coverage.out ./...
+- "$GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken
+  $COVERALLS_TOKEN"
 env:
   global:
-    secure: m7fWfAh3RPtFSZ7964qV4P6Y5BF4sNTwQE3QSTd0lsdWgS6h/7X3Cupm/FOb5TJgUi5Fgn1zPpNA0V2Kf6RHGzoz25OEvLyGiLy49hyizVusi8JVh7mCR+zPyGMjOfh1NAJok4o9hrn39vzYBFyHWRNBeC3D5BNV0jrPIkITm0Vfg8U4cOIw3molVhmAgVJXUMjaKt+Ca6tGeU6rJwIR3hvgN7hefJ7AXhoL1F35XUxI/E8yQwEI3yIOUeDbOf6I+/AENUaj8Z3y/QZJyhkbff2sRjSjjXQyv+xGiWl00DmY5ZnkykbL5nfDqYMmZG6T5KtiZJNwnrMvBA7md7yNYP1dYZg00yBDG3XR+IIoGhrvV5CfSbzBPgXLTgVLVl4PG8GghJXLGGrjLOzPeclcctabQRF3xCJjeN51xgeO7nfRtTwgj34KFIBExm30tMpdjlGJ9YcVrVFN0951Mo/bQS18kwNUPwntygJRHBTfIsbzUSU/8vzQdMroeaL07DXboNjIijnQaA33NVGv7bRcDpcun6cj02/Or+7zbg8UjAEK+kW8wPyxWRMRPTYGa4VDc9mee3IXCjrheRhW7ghQboM1Ch8cYL8o/+mPyBebav4YKp0BteejBFduwALhzAevzRuWbGb2oKe4m4ythOKUhGWbM94t89VpCGhV1Qhgmvc=
+    secure: IC5WhBu5MSR+MnV5pIc+zrSxM8qPBBfK5mmbCsAoXwwDrqr6b0Vek9d4fpowxE1fpOYXxrCl8FCdiqjI73FDsp7CUw3i5XUxTmltfNS/HZoIr1jdZyxUoBS4pO8qh+DSUKzowbE00xh2KI4C8dNq5I2MzS9TN4urokBIGPe0vX/n1Ej1hTj5mehh0RX/ewKkxwEXvhLWs5ZmgH+/H9HXaWecBqjnigJB8pEGeykDaQjN5ae2Czu/YzbPaDL8gsgNkafAWQ1BAfENypdWokGGT5ohxLbuEQDqrsB3keqQBI6pM8XJ+p46pGDfaqyoydK5vMDUdhzwJdlUqa9kGXfrQMubUWgcNtuMO6p1MQ0aRocfcHeEKAK1Qew1OX99jIZdkJcfYhsLSlc1w2MEk/PFh1YTKpMaH4vfXozIEmsKM5W1py8l3fp0kv3OMYmy4DSkzH7TG6UZ9Zl3G0qUxuNdm0uSAsyuxaiUIfldHrFAzo9a8bZeyiCVAbI0pl+pxx59FlTw/CbYfc8k75m/7Ed9yMGV8N4bYTLZglD/IRhiaQqhkfeLGx/szzIY73lrirW3pTQedAE2bx7QI+8Rehug6mIWaLYhTOBIqxejPAdWvxEvweTztxGRa9fCFj9ig3jLaf50Z8Hf9Zyv3y2PJQeQz89/M4TuXRPXBIcSaXskmPE=
