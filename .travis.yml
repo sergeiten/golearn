@@ -6,9 +6,10 @@ install:
 - go get golang.org/x/tools/cmd/cover
 - go get github.com/mattn/goveralls
 script:
-- go test -v -race -covermode=count -coverprofile=coverage.out ./...
+- go test -v -covermode=count -coverprofile=coverage.out ./...
 - "$GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken
   $COVERALLS_TOKEN"
+- go test -v -race ./...
 env:
   global:
     secure: IC5WhBu5MSR+MnV5pIc+zrSxM8qPBBfK5mmbCsAoXwwDrqr6b0Vek9d4fpowxE1fpOYXxrCl8FCdiqjI73FDsp7CUw3i5XUxTmltfNS/HZoIr1jdZyxUoBS4pO8qh+DSUKzowbE00xh2KI4C8dNq5I2MzS9TN4urokBIGPe0vX/n1Ej1hTj5mehh0RX/ewKkxwEXvhLWs5ZmgH+/H9HXaWecBqjnigJB8pEGeykDaQjN5ae2Czu/YzbPaDL8gsgNkafAWQ1BAfENypdWokGGT5ohxLbuEQDqrsB3keqQBI6pM8XJ+p46pGDfaqyoydK5vMDUdhzwJdlUqa9kGXfrQMubUWgcNtuMO6p1MQ0aRocfcHeEKAK1Qew1OX99jIZdkJcfYhsLSlc1w2MEk/PFh1YTKpMaH4vfXozIEmsKM5W1py8l3fp0kv3OMYmy4DSkzH7TG6UZ9Zl3G0qUxuNdm0uSAsyuxaiUIfldHrFAzo9a8bZeyiCVAbI0pl+pxx59FlTw/CbYfc8k75m/7Ed9yMGV8N4bYTLZglD/IRhiaQqhkfeLGx/szzIY73lrirW3pTQedAE2bx7QI+8Rehug6mIWaLYhTOBIqxejPAdWvxEvweTztxGRa9fCFj9ig3jLaf50Z8Hf9Zyv3y2PJQeQz89/M4TuXRPXBIcSaXskmPE=
