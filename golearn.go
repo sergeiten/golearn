@@ -95,7 +95,7 @@ func LogPrint(err error, message string) {
 	}
 }
 
-// LogPrintf prints error message with stach trace.
+// LogPrintf prints error message with stack trace.
 // Arguments are handled in the manner of fmt.Printf.
 func LogPrintf(err error, message string, args ...interface{}) {
 	if err != nil {

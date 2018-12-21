@@ -38,7 +38,7 @@ func main() {
 	defer service.Close()
 
 	telegramHTTP := telegram.NewHTTP(telegram.HTTPConfig{
-		API:   os.Getenv("TELEGRAM_BOT_TOKEN"),
+		API:   os.Getenv("TELEGRAM_API_URL"),
 		Token: os.Getenv("TELEGRAM_BOT_TOKEN"),
 	})
 
