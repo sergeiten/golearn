@@ -1,6 +1,5 @@
 language: go
 go:
-- 1.10.x
 - 1.11.x
 install:
 - go get golang.org/x/tools/cmd/cover
@@ -19,8 +18,5 @@ env:
 before_install:
 - openssl aes-256-cbc -K $encrypted_fd443337f3b8_key -iv $encrypted_fd443337f3b8_iv
   -in .travis/id_rsa.enc -out .travis/id_rsa -d
-deploy:
-  provider: script
-  script: bash .travis/deploy.sh
-  on:
-    branch: master
+after_success:
+  - .travis/deploy.sh
