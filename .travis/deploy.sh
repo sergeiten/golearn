@@ -9,5 +9,6 @@ git remote add deploy ssh://$DEPLOY_USER@$DEPLOY_URL:$DEPLOY_DIR
 git push deploy master
 
 ssh $DEPLOY_USER@$DEPLOY_URL <<EOF
+    cd $DEPLOY_DIR
     make build
 EOF

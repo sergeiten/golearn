@@ -1,3 +1,5 @@
+coverage.out
 .vscode
 .idea
 .env
+.travis/id_rsa
