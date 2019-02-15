@@ -22,4 +22,4 @@ after_success:
   - .travis/deploy.sh
 addons:
   ssh_known_hosts:
-    - $DEPLOY_URL
+    - tellmetom.com
