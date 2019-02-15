@@ -21,6 +21,6 @@ before_install:
   -in .travis/id_rsa.enc -out .travis/id_rsa -d
 deploy:
   provider: script
-  script: bash ./travis/deploy.sh
+  script: bash .travis/deploy.sh
   on:
     branch: master
