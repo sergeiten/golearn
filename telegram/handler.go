@@ -113,7 +113,7 @@ func (h *Handler) handle(update *golearn.Update) (string, ReplyMarkup, error) {
 	case strings.HasPrefix(update.Message, h.lang["categories_icon"]):
 		return h.setCategory(update)
 	case update.Message == h.lang["reset_category"]:
-		return h.setCategory(update)
+		return h.resetCategory(update)
 	default:
 		return h.answer(update)
 	}
@@ -209,6 +209,17 @@ func (h *Handler) setCategory(update *golearn.Update) (message string, markup Re
 	keyboard := h.mainMenuKeyboard()
 
 	return h.lang["category_set"], keyboard, nil
+}
+
+func (h *Handler) resetCategory(update *golearn.Update) (message string, markup ReplyMarkup, err error) {
+	err = h.db.SetUserCategory(h.user.UserID, "")
+	if err != nil {
+		return "", ReplyMarkup{}, err
+	}
+
+	keyboard := h.mainMenuKeyboard()
+
+	return h.lang["category_reset"], keyboard, nil
 }
 
 func (h *Handler) setMode(mode string) (message string, markup ReplyMarkup, err error) {

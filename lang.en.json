@@ -21,5 +21,6 @@
   "categories":  "/Categories",
   "pick_category": "Pick category",
   "category_set": "Category has been set successfully",
-  "reset_category": "Reset category"
+  "category_reset": "Category has been reset successfully",
+  "reset_category": "/Reset category"
 }
