@@ -152,20 +152,20 @@ func (_m *DBService) RandomAnswers(q golearn.Row, limit int) ([]golearn.Row, err
 	return r0, r1
 }
 
-// RandomQuestion provides a mock function with given fields:
-func (_m *DBService) RandomQuestion() (golearn.Row, error) {
-	ret := _m.Called()
+// RandomQuestion provides a mock function with given fields: category
+func (_m *DBService) RandomQuestion(category string) (golearn.Row, error) {
+	ret := _m.Called(category)
 
 	var r0 golearn.Row
-	if rf, ok := ret.Get(0).(func() golearn.Row); ok {
-		r0 = rf()
+	if rf, ok := ret.Get(0).(func(string) golearn.Row); ok {
+		r0 = rf(category)
 	} else {
 		r0 = ret.Get(0).(golearn.Row)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func() error); ok {
-		r1 = rf()
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(category)
 	} else {
 		r1 = ret.Error(1)
 	}

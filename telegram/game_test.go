@@ -517,6 +517,14 @@ func TestStartWithTypingMode(t *testing.T) {
 		Message:  "command",
 	}
 
+	user := golearn.User{
+		UserID:   "177374215",
+		Username: "sergeiten",
+		Name:     "Sergei",
+		Mode:     golearn.ModePicking,
+		Category: "",
+	}
+
 	testCases := map[string]struct {
 		Message       string
 		Markup        ReplyMarkup
@@ -577,7 +585,8 @@ func TestStartWithTypingMode(t *testing.T) {
 				ColsCount:       2,
 			})
 
-			dbService.On("RandomQuestion").Return(tc.Question, tc.RandomError)
+			dbService.On("GetUser", update.UserID).Return(user, nil)
+			dbService.On("RandomQuestion", user.Category).Return(tc.Question, tc.RandomError)
 			if tc.RandomError == nil {
 				dbService.On("SetState", golearn.State{
 					UserKey:   update.UserID,
@@ -609,6 +618,14 @@ func TestStartWithPickingModeWithRandomQuestionError(t *testing.T) {
 		Message:  "command",
 	}
 
+	user := golearn.User{
+		UserID:   "177374215",
+		Username: "sergeiten",
+		Name:     "Sergei",
+		Mode:     golearn.ModePicking,
+		Category: "",
+	}
+
 	expectedMessage := ""
 	expectedMarkup := ReplyMarkup{}
 	expectedError := sampleError
@@ -625,7 +642,8 @@ func TestStartWithPickingModeWithRandomQuestionError(t *testing.T) {
 		ColsCount:       2,
 	})
 
-	dbService.On("RandomQuestion").Return(golearn.Row{}, sampleError)
+	dbService.On("GetUser", update.UserID).Return(user, nil)
+	dbService.On("RandomQuestion", user.Category).Return(golearn.Row{}, sampleError)
 
 	message, markup, err := handler.startWithPickingMode(&update)
 
@@ -645,6 +663,14 @@ func TestStartWithPickingModeWithRandomAnswersError(t *testing.T) {
 		Username: "sergeiten",
 		Name:     "Sergei",
 		Message:  "command",
+	}
+
+	user := golearn.User{
+		UserID:   "177374215",
+		Username: "sergeiten",
+		Name:     "Sergei",
+		Mode:     golearn.ModePicking,
+		Category: "",
 	}
 
 	question := golearn.Row{
@@ -668,7 +694,8 @@ func TestStartWithPickingModeWithRandomAnswersError(t *testing.T) {
 		ColsCount:       2,
 	})
 
-	dbService.On("RandomQuestion").Return(question, nil)
+	dbService.On("GetUser", update.UserID).Return(user, nil)
+	dbService.On("RandomQuestion", user.Category).Return(question, nil)
 	dbService.On("RandomAnswers", question, 4).Return([]golearn.Row{}, sampleError)
 
 	message, markup, err := handler.startWithPickingMode(&update)
@@ -687,6 +714,14 @@ func TestStartWithPickingModeWithEmptyAnswersError(t *testing.T) {
 		Username: "sergeiten",
 		Name:     "Sergei",
 		Message:  "command",
+	}
+
+	user := golearn.User{
+		UserID:   "177374215",
+		Username: "sergeiten",
+		Name:     "Sergei",
+		Mode:     golearn.ModePicking,
+		Category: "",
 	}
 
 	question := golearn.Row{
@@ -711,7 +746,8 @@ func TestStartWithPickingModeWithEmptyAnswersError(t *testing.T) {
 		ColsCount:       2,
 	})
 
-	dbService.On("RandomQuestion").Return(question, nil)
+	dbService.On("GetUser", update.UserID).Return(user, nil)
+	dbService.On("RandomQuestion", user.Category).Return(question, nil)
 	dbService.On("RandomAnswers", question, 4).Return(answers, nil)
 
 	message, markup, err := handler.startWithPickingMode(&update)
@@ -732,6 +768,14 @@ func TestStartWithPickingModeWithSetStateError(t *testing.T) {
 		Username: "sergeiten",
 		Name:     "Sergei",
 		Message:  "command",
+	}
+
+	user := golearn.User{
+		UserID:   "177374215",
+		Username: "sergeiten",
+		Name:     "Sergei",
+		Mode:     golearn.ModePicking,
+		Category: "",
 	}
 
 	question := golearn.Row{
@@ -773,7 +817,8 @@ func TestStartWithPickingModeWithSetStateError(t *testing.T) {
 		ColsCount:       2,
 	})
 
-	dbService.On("RandomQuestion").Return(question, nil)
+	dbService.On("GetUser", update.UserID).Return(user, nil)
+	dbService.On("RandomQuestion", user.Category).Return(question, nil)
 	dbService.On("RandomAnswers", question, 4).Return(answers, nil)
 	dbService.On("SetState", golearn.State{
 		UserKey:   update.UserID,
@@ -798,6 +843,14 @@ func TestStartWithPickingMode(t *testing.T) {
 		Username: "sergeiten",
 		Name:     "Sergei",
 		Message:  "command",
+	}
+
+	user := golearn.User{
+		UserID:   "177374215",
+		Username: "sergeiten",
+		Name:     "Sergei",
+		Mode:     golearn.ModePicking,
+		Category: "",
 	}
 
 	question := golearn.Row{
@@ -854,7 +907,8 @@ func TestStartWithPickingMode(t *testing.T) {
 		ColsCount:       2,
 	})
 
-	dbService.On("RandomQuestion").Return(question, nil)
+	dbService.On("GetUser", update.UserID).Return(user, nil)
+	dbService.On("RandomQuestion", user.Category).Return(question, nil)
 	dbService.On("RandomAnswers", question, 4).Return(answers, nil)
 	dbService.On("SetState", golearn.State{
 		UserKey:   update.UserID,

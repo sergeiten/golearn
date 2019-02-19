@@ -48,7 +48,7 @@ func (s Service) Close() {
 }
 
 // RandomQuestion returns random row
-func (s Service) RandomQuestion() (golearn.Row, error) {
+func (s Service) RandomQuestion(category string) (golearn.Row, error) {
 	r := golearn.Row{}
 
 	count, err := s.session.DB("golearn").C("words").Count()
@@ -56,7 +56,15 @@ func (s Service) RandomQuestion() (golearn.Row, error) {
 		return r, err
 	}
 
-	query := s.session.DB("golearn").C("words").Find(bson.M{}).Limit(1).Skip(rand.Intn(count))
+	condition := bson.M{}
+
+	if category != "" {
+		condition = bson.M{
+			"category": category,
+		}
+	}
+
+	query := s.session.DB("golearn").C("words").Find(condition).Limit(1).Skip(rand.Intn(count))
 
 	err = query.One(&r)
 
@@ -65,7 +73,7 @@ func (s Service) RandomQuestion() (golearn.Row, error) {
 
 // RandomAnswers returns random answers with given limit
 func (s Service) RandomAnswers(q golearn.Row, limit int) ([]golearn.Row, error) {
-	r := []golearn.Row{}
+	var r []golearn.Row
 
 	count, err := s.session.DB("golearn").C("words").Count()
 	if err != nil {

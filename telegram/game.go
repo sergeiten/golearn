@@ -21,7 +21,12 @@ func (h *Handler) start(update *golearn.Update) (message string, markup ReplyMar
 }
 
 func (h *Handler) startWithPickingMode(update *golearn.Update) (message string, markup ReplyMarkup, err error) {
-	question, err := h.db.RandomQuestion()
+	user, err := h.db.GetUser(update.UserID)
+	if err != nil {
+		return "", ReplyMarkup{}, err
+	}
+
+	question, err := h.db.RandomQuestion(user.Category)
 	if err != nil {
 		return "", ReplyMarkup{}, err
 	}
@@ -61,7 +66,12 @@ func (h *Handler) startWithPickingMode(update *golearn.Update) (message string, 
 }
 
 func (h *Handler) startWithTypingMode(update *golearn.Update) (message string, markup ReplyMarkup, err error) {
-	question, err := h.db.RandomQuestion()
+	user, err := h.db.GetUser(update.UserID)
+	if err != nil {
+		return "", ReplyMarkup{}, err
+	}
+
+	question, err := h.db.RandomQuestion(user.Category)
 	if err != nil {
 		return "", ReplyMarkup{}, err
 	}

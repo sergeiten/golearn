@@ -65,7 +65,7 @@ type State struct {
 
 // DBService ...
 type DBService interface {
-	RandomQuestion() (Row, error)
+	RandomQuestion(category string) (Row, error)
 	RandomAnswers(q Row, limit int) ([]Row, error)
 	SetState(State) error
 	GetState(string) (State, error)

@@ -136,8 +136,12 @@ func (h *Handler) handleHelp() (*message, error) {
 
 // handleStart returns message for start action
 func (h *Handler) handleStart(cmd *command) (*message, error) {
+	user, err := h.service.GetUser(cmd.UserKey)
+	if err != nil {
+		return nil, err
+	}
 	m := &message{}
-	question, err := h.service.RandomQuestion()
+	question, err := h.service.RandomQuestion(user.Category)
 	if err != nil {
 		return m, err
 	}
