@@ -88,11 +88,11 @@ func (h *Handler) handle(update *golearn.Update) (string, ReplyMarkup, error) {
 	switch update.Message {
 	case h.lang["main_menu"]:
 		return h.mainMenu(update)
+	case "/start":
+		return h.mainMenu(update)
 	case h.lang["help"]:
 		return h.help(update)
 	case h.lang["start"]:
-		return h.start(update)
-	case "/start":
 		return h.start(update)
 	case h.lang["next_word"]:
 		return h.start(update)
