@@ -199,7 +199,9 @@ func (h *Handler) categories(update *golearn.Update) (message string, markup Rep
 }
 
 func (h *Handler) setCategory(update *golearn.Update) (message string, markup ReplyMarkup, err error) {
-	err = h.db.SetUserCategory(h.user.UserID, update.Message)
+	// remove category icon
+	category := strings.Trim(strings.Replace(update.Message, h.lang["categories_icon"], "", -1), " ")
+	err = h.db.SetUserCategory(h.user.UserID, category)
 	if err != nil {
 		return "", ReplyMarkup{}, err
 	}
