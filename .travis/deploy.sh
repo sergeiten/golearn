@@ -2,9 +2,8 @@
 
 eval "$(ssh-agent -s)"
 chmod 600 .travis/id_rsa
+echo -e "Host $DEPLOY_URL\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 ssh-add .travis/id_rsa
-
-ssh-keyscan -t $TRAVIS_SSH_KEY_TYPES -H $DEPLOY_URL 2>&1 | tee -a $HOME/.ssh/known_hosts
 
 git config --global push.default matching
 git remote add deploy ssh://$DEPLOY_USER@$DEPLOY_URL:$DEPLOY_DIR
