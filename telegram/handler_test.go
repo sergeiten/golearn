@@ -336,3 +336,74 @@ func TestSetCategory(t *testing.T) {
 		})
 	}
 }
+
+func TestCategories(t *testing.T) {
+	testCases := map[string]struct {
+		Update     *golearn.Update
+		Categories []golearn.Category
+		Message    string
+		Markup     ReplyMarkup
+		Error      error
+	}{
+		"categories with no error": {
+			Update: &golearn.Update{
+				ChatID:   "177374215",
+				UserID:   "177374215",
+				Username: "sergeiten",
+				Name:     "Sergei",
+				Message:  "",
+			},
+			Categories: []golearn.Category{
+				{
+					Name:  "2019-01-01",
+					Words: 10,
+				},
+				{
+					Name:  "2019-01-02",
+					Words: 15,
+				},
+			},
+			Message: lang["pick_category"],
+			Markup: ReplyMarkup{
+				Keyboard: [][]string{
+					{
+						lang["categories_icon"] + " 2019-01-01",
+						lang["categories_icon"] + " 2019-01-02",
+					},
+					{
+						lang["reset_category"],
+						lang["main_menu"],
+					},
+				},
+				ResizeKeyboard: true,
+			},
+			Error: nil,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			dbService := &mocks.DBService{}
+			httpService := &mocks.HttpService{}
+
+			handler = New(HandlerConfig{
+				DBService:       dbService,
+				HTTPService:     httpService,
+				Lang:            lang,
+				DefaultLanguage: "ru",
+				Token:           botToken,
+				ColsCount:       2,
+			})
+
+			dbService.On("GetCategories", tc.Update.UserID).Return(tc.Categories, tc.Error)
+
+			message, markup, err := handler.categories(tc.Update)
+
+			assert.Equal(t, tc.Message, message)
+			assert.Equal(t, tc.Markup, markup)
+			assert.Equal(t, tc.Error, err)
+
+			dbService.AssertExpectations(t)
+		})
+	}
+}

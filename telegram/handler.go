@@ -166,7 +166,7 @@ func (h *Handler) categories(update *golearn.Update) (message string, markup Rep
 	r := float64(len(categories)) / float64(h.cols)
 	rows := int(math.Ceil(r))
 
-	keyboard := make([][]string, len(categories)-1)
+	keyboard := make([][]string, rows+1)
 
 	for _, a := range categories {
 		options = append(options, h.lang["categories_icon"]+" "+a.Name)
