@@ -165,6 +165,7 @@ func TestSettings(t *testing.T) {
 			{
 				lang["mode_picking"],
 				lang["mode_typing"],
+				lang["categories"],
 			},
 		},
 		ResizeKeyboard: true,
@@ -249,87 +250,89 @@ func TestSetMode(t *testing.T) {
 	}
 }
 
-//func TestHandle(t *testing.T) {
-//	testCases := []struct {
-//		Command string
-//		Message string
-//		Markup  ReplyMarkup
-//		Error   error
-//	}{
-//		{
-//			Command: lang["main_menu"],
-//			Message: lang["welcome"],
-//			Markup: ReplyMarkup{
-//				Keyboard: [][]string{
-//					{
-//						lang["start"],
-//						lang["settings"],
-//						lang["help"],
-//					},
-//				},
-//				ResizeKeyboard: true,
-//			},
-//			Error: nil,
-//		},
-//	}
-//	//commands := []string{
-//	//lang["main_menu"],
-//	//lang["help"],
-//	//lang["start"],
-//	//lang["next_word"],
-//	//lang["again"],
-//	//lang["settings"],
-//	//lang["mode_picking"],
-//	//lang["mode_picking"],
-//	//lang["show_answer"],
-//	//}
-//
-//	err := handler.Serve()
-//	if err != nil {
-//		t.Fatalf("failed to serve: %v", err)
-//	}
-//
-//	update := TUpdate{
-//		UpdateID: 148790442,
-//		Message: TMessage{
-//			Chat: TChat{
-//				ID:        177374215,
-//				Username:  "sergeiten",
-//				Firstname: "Sergei",
-//			},
-//			MessageID: 27,
-//			Text:      "",
-//			Date:      1459919262,
-//		},
-//	}
-//
-//	for _, command := range commands {
-//		update.Message.Text = command
-//
-//		dat, err := json.Marshal(update)
-//		if err != nil {
-//			t.Fatalf("failed to marshal update: %v", err)
-//		}
-//
-//		req := httptest.NewRequest("POST", "/"+botToken+"/processMessage/", strings.NewReader(string(dat)))
-//
-//		rr := httptest.NewRecorder()
-//
-//		handler.ServeHTTP(rr, req)
-//
-//		//if status := rr.Code; status != http.StatusOK {
-//		//	t.Errorf("handler returned wrong status code: got %v, want %v", status, http.StatusOK)
-//		//}
-//
-//		assert.Equal(t, http.StatusOK, rr.Code)
-//
-//		data, err := ioutil.ReadAll(rr.Body)
-//		if err != nil {
-//			t.Errorf("failed to read response body: %v", err)
-//		}
-//
-//		resp := string(data)
-//
-//		assert.Equal(t, "OK", resp)
-//	}
-//}
+func TestSetCategory(t *testing.T) {
+	testCases := map[string]struct {
+		User     golearn.User
+		Update   *golearn.Update
+		Category string
+		Message  string
+		Markup   ReplyMarkup
+		Error    error
+	}{
+		"set category with no error": {
+			User: golearn.User{
+				UserID:   "177374215",
+				Username: "sergeiten",
+				Name:     "Sergei",
+				Mode:     golearn.ModePicking,
+			},
+			Update: &golearn.Update{
+				ChatID:   "177374215",
+				UserID:   "177374215",
+				Username: "sergeiten",
+				Name:     "Sergei",
+				Message:  "2019-01-01",
+			},
+			Category: "2019-01-01",
+			Message:  lang["category_set"],
+			Markup: ReplyMarkup{
+				Keyboard: [][]string{
+					{
+						lang["start"],
+						lang["settings"],
+						lang["help"],
+					},
+				},
+				ResizeKeyboard: true,
+			},
+			Error: nil,
+		},
+		"set category with error": {
+			User: golearn.User{
+				UserID:   "177374215",
+				Username: "sergeiten",
+				Name:     "Sergei",
+				Mode:     golearn.ModePicking,
+			},
+			Update: &golearn.Update{
+				ChatID:   "177374215",
+				UserID:   "177374215",
+				Username: "sergeiten",
+				Name:     "Sergei",
+				Message:  "2019-01-01",
+			},
+			Category: "2019-01-01",
+			Message:  "",
+			Markup:   ReplyMarkup{},
+			Error:    errors.New("sample error"),
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			dbService := &mocks.DBService{}
+			httpService := &mocks.HttpService{}
+
+			handler = New(HandlerConfig{
+				DBService:       dbService,
+				HTTPService:     httpService,
+				Lang:            lang,
+				DefaultLanguage: "ru",
+				Token:           botToken,
+				ColsCount:       2,
+			})
+
+			handler.user = tc.User
+
+			dbService.On("SetUserCategory", tc.User.UserID, tc.Category).Return(tc.Error)
+
+			message, markup, err := handler.setCategory(tc.Update)
+
+			assert.Equal(t, tc.Message, message)
+			assert.Equal(t, tc.Markup, markup)
+			assert.Equal(t, tc.Error, err)
+
+			dbService.AssertExpectations(t)
+		})
+	}
+}

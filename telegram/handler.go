@@ -3,7 +3,9 @@ package telegram
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
+	"strings"
 
 	"github.com/sergeiten/golearn"
 )
@@ -85,27 +87,33 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) handle(update *golearn.Update) (string, ReplyMarkup, error) {
-	switch update.Message {
-	case h.lang["main_menu"]:
+	switch {
+	case update.Message == h.lang["main_menu"]:
 		return h.mainMenu(update)
-	case "/start":
+	case update.Message == "/start":
 		return h.mainMenu(update)
-	case h.lang["help"]:
+	case update.Message == h.lang["help"]:
 		return h.help(update)
-	case h.lang["start"]:
+	case update.Message == h.lang["start"]:
 		return h.start(update)
-	case h.lang["next_word"]:
+	case update.Message == h.lang["next_word"]:
 		return h.start(update)
-	case h.lang["again"]:
+	case update.Message == h.lang["again"]:
 		return h.again(update)
-	case h.lang["settings"]:
+	case update.Message == h.lang["settings"]:
 		return h.settings(update)
-	case h.lang["mode_picking"]:
+	case update.Message == h.lang["mode_picking"]:
 		return h.setMode(golearn.ModePicking)
-	case h.lang["mode_typing"]:
+	case update.Message == h.lang["mode_typing"]:
 		return h.setMode(golearn.ModeTyping)
-	case h.lang["show_answer"]:
+	case update.Message == h.lang["show_answer"]:
 		return h.showAnswer(update)
+	case update.Message == h.lang["categories"]:
+		return h.categories(update)
+	case strings.HasPrefix(update.Message, h.lang["categories_icon"]):
+		return h.setCategory(update)
+	case update.Message == h.lang["reset_category"]:
+		return h.setCategory(update)
 	default:
 		return h.answer(update)
 	}
@@ -137,12 +145,68 @@ func (h *Handler) settings(update *golearn.Update) (message string, markup Reply
 			{
 				h.lang["mode_picking"],
 				h.lang["mode_typing"],
+				h.lang["categories"],
 			},
 		},
 		ResizeKeyboard: true,
 	}
 
 	return h.lang["mode_explain"], keyboard, nil
+}
+
+func (h *Handler) categories(update *golearn.Update) (message string, markup ReplyMarkup, err error) {
+	categories, err := h.db.GetCategories(update.UserID)
+	if err != nil {
+		return "", ReplyMarkup{}, err
+	}
+
+	var reply ReplyMarkup
+	var options []string
+
+	r := float64(len(categories)) / float64(h.cols)
+	rows := int(math.Ceil(r))
+
+	keyboard := make([][]string, len(categories)-1)
+
+	for _, a := range categories {
+		options = append(options, h.lang["categories_icon"]+" "+a.Name)
+	}
+
+	start := 0
+	for i := 0; i < rows; i++ {
+		if i > 0 {
+			start = h.cols * i
+		}
+
+		finish := start + h.cols
+
+		if finish > len(categories) {
+			finish = len(options)
+		}
+
+		keyboard[i] = options[start:finish]
+	}
+
+	keyboard[rows] = []string{
+		h.lang["reset_category"],
+		h.lang["main_menu"],
+	}
+
+	reply.Keyboard = keyboard
+	reply.ResizeKeyboard = true
+
+	return h.lang["pick_category"], reply, nil
+}
+
+func (h *Handler) setCategory(update *golearn.Update) (message string, markup ReplyMarkup, err error) {
+	err = h.db.SetUserCategory(h.user.UserID, update.Message)
+	if err != nil {
+		return "", ReplyMarkup{}, err
+	}
+
+	keyboard := h.mainMenuKeyboard()
+
+	return h.lang["category_set"], keyboard, nil
 }
 
 func (h *Handler) setMode(mode string) (message string, markup ReplyMarkup, err error) {

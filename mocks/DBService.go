@@ -36,6 +36,29 @@ func (_m *DBService) ExistUser(user golearn.User) (bool, error) {
 	return r0, r1
 }
 
+// GetCategories provides a mock function with given fields: userID
+func (_m *DBService) GetCategories(userID string) ([]golearn.Category, error) {
+	ret := _m.Called(userID)
+
+	var r0 []golearn.Category
+	if rf, ok := ret.Get(0).(func(string) []golearn.Category); ok {
+		r0 = rf(userID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]golearn.Category)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(userID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetState provides a mock function with given fields: _a0
 func (_m *DBService) GetState(_a0 string) (golearn.State, error) {
 	ret := _m.Called(_a0)
@@ -57,20 +80,20 @@ func (_m *DBService) GetState(_a0 string) (golearn.State, error) {
 	return r0, r1
 }
 
-// GetUser provides a mock function with given fields: userid
-func (_m *DBService) GetUser(userid string) (golearn.User, error) {
-	ret := _m.Called(userid)
+// GetUser provides a mock function with given fields: userID
+func (_m *DBService) GetUser(userID string) (golearn.User, error) {
+	ret := _m.Called(userID)
 
 	var r0 golearn.User
 	if rf, ok := ret.Get(0).(func(string) golearn.User); ok {
-		r0 = rf(userid)
+		r0 = rf(userID)
 	} else {
 		r0 = ret.Get(0).(golearn.User)
 	}
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(userid)
+		r1 = rf(userID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -171,6 +194,20 @@ func (_m *DBService) SetState(_a0 golearn.State) error {
 	var r0 error
 	if rf, ok := ret.Get(0).(func(golearn.State) error); ok {
 		r0 = rf(_a0)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// SetUserCategory provides a mock function with given fields: userID, category
+func (_m *DBService) SetUserCategory(userID string, category string) error {
+	ret := _m.Called(userID, category)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(userID, category)
 	} else {
 		r0 = ret.Error(0)
 	}

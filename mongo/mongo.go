@@ -131,21 +131,48 @@ func (s Service) ExistUser(user golearn.User) (bool, error) {
 }
 
 // GetUser returns user from db
-func (s Service) GetUser(id string) (golearn.User, error) {
+func (s Service) GetUser(userID string) (golearn.User, error) {
 	u := golearn.User{}
-	if id == "" {
+	if userID == "" {
 		return u, errors.New("passed user id is empty")
 	}
-	err := s.session.DB("golearn").C("users").Find(bson.M{"userid": id}).One(&u)
+	err := s.session.DB("golearn").C("users").Find(bson.M{"userid": userID}).One(&u)
 
 	return u, err
 }
 
 // SetUserMode sets new mode for passed user id
-func (s Service) SetUserMode(userid string, mode string) error {
-	return s.session.DB("golearn").C("users").Update(bson.M{"userid": userid}, bson.M{
+func (s Service) SetUserMode(userID string, mode string) error {
+	return s.session.DB("golearn").C("users").Update(bson.M{"userid": userID}, bson.M{
 		"$set": bson.M{
 			"mode": mode,
+		},
+	})
+}
+
+// GetCategories returns list of unique categories based on words table.
+func (s Service) GetCategories(userID string) ([]golearn.Category, error) {
+	var categories []golearn.Category
+
+	err := s.session.DB("golearn").C("words").Pipe(bson.M{
+		"$group": bson.M{
+			"_id": "$category",
+			"name": bson.M{
+				"$first": "$category",
+			},
+			"words": bson.M{
+				"$sum": 1,
+			},
+		},
+	}).All(&categories)
+
+	return categories, err
+}
+
+func (s Service) SetUserCategory(userID string, category string) error {
+	return s.session.DB("golearn").C("users").Update(bson.M{"userid": userID}, bson.M{
+		"$set": bson.M{
+			"category": category,
 		},
 	})
 }

@@ -27,12 +27,19 @@ type Row struct {
 	Translate string
 }
 
+// Category represents category model.
+type Category struct {
+	Name  string
+	Words int
+}
+
 // User represents user model
 type User struct {
 	UserID   string
 	Username string
 	Name     string
 	Mode     string
+	Category string
 }
 
 // Update represents joint response data model from service (telegram, kakaotalk).
@@ -52,6 +59,7 @@ type State struct {
 	Question  Row
 	Answers   []Row
 	Mode      string
+	Category  string
 	Timestamp int64
 }
 
@@ -66,8 +74,10 @@ type DBService interface {
 	InsertUser(user User) error
 	UpdateUser(user User) error
 	ExistUser(user User) (bool, error)
-	GetUser(userid string) (User, error)
+	GetUser(userID string) (User, error)
 	SetUserMode(userID string, mode string) error
+	GetCategories(userID string) ([]Category, error)
+	SetUserCategory(userID string, category string) error
 	Close()
 }
 
