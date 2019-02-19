@@ -154,14 +154,16 @@ func (s Service) SetUserMode(userID string, mode string) error {
 func (s Service) GetCategories(userID string) ([]golearn.Category, error) {
 	var categories []golearn.Category
 
-	err := s.session.DB("golearn").C("words").Pipe(bson.M{
-		"$group": bson.M{
-			"_id": "$category",
-			"name": bson.M{
-				"$first": "$category",
-			},
-			"words": bson.M{
-				"$sum": 1,
+	err := s.session.DB("golearn").C("words").Pipe([]bson.M{
+		{
+			"$group": bson.M{
+				"_id": "$category",
+				"name": bson.M{
+					"$first": "$category",
+				},
+				"words": bson.M{
+					"$sum": 1,
+				},
 			},
 		},
 	}).All(&categories)
