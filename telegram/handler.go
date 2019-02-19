@@ -92,6 +92,8 @@ func (h *Handler) handle(update *golearn.Update) (string, ReplyMarkup, error) {
 		return h.help(update)
 	case h.lang["start"]:
 		return h.start(update)
+	case "/start":
+		return h.start(update)
 	case h.lang["next_word"]:
 		return h.start(update)
 	case h.lang["again"]:

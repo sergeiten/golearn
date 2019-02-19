@@ -11,7 +11,7 @@ import (
 	"github.com/sergeiten/golearn"
 )
 
-// HTTP structs implements HTTPService interface for telegram.
+// HTTP implements HTTPService interface for telegram.
 type HTTP struct {
 	api   string
 	token string

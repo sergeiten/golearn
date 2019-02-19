@@ -98,11 +98,8 @@ func (h *Handler) commandFromRequest(r *http.Request) (*command, error) {
 	defer r.Body.Close()
 
 	err = json.Unmarshal(data, cmd)
-	if err != nil {
-		return cmd, err
-	}
 
-	return cmd, nil
+	return cmd, err
 }
 
 func (h *Handler) keyboard(w http.ResponseWriter, r *http.Request) {
