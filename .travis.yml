@@ -20,5 +20,3 @@ before_install:
     -in .travis/id_rsa.enc -out .travis/id_rsa -d
 after_success:
   - .travis/deploy.sh
-before_deploy:
-  - ssh-keyscan -t $TRAVIS_SSH_KEY_TYPES -H $DEPLOY_URL 2>&1 | tee -a $HOME/.ssh/known_hosts
