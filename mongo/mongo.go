@@ -136,7 +136,7 @@ func (s Service) GetUser(id string) (golearn.User, error) {
 	if id == "" {
 		return u, errors.New("passed user id is empty")
 	}
-	err := s.session.DB("golearn").C("users").Find(bson.M{"id": id}).One(&u)
+	err := s.session.DB("golearn").C("users").Find(bson.M{"userid": id}).One(&u)
 
 	return u, err
 }
