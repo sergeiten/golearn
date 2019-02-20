@@ -2,6 +2,7 @@ package golearn
 
 import (
 	"os"
+	"strconv"
 )
 
 // Config ...
@@ -18,6 +19,7 @@ type Database struct {
 	User     string `json:"user"`
 	Name     string `json:"name"`
 	Password string `json:"password"`
+	Delay    int    `json:"delay"`
 }
 
 // ConfigFromEnv returns config based on environment variables
@@ -30,6 +32,12 @@ func ConfigFromEnv() *Config {
 	cfg.Database.Name = os.Getenv("DB_NAME")
 	cfg.Database.User = os.Getenv("DB_USER")
 	cfg.Database.Password = os.Getenv("DB_PASSWORD")
+
+	delay, err := strconv.Atoi(os.Getenv("DB_DELAY"))
+	if err != nil {
+		LogPrint(err, "failed to convert delay env")
+	}
+	cfg.Database.Delay = delay
 
 	cfg.DefaultLanguage = os.Getenv("DEFAULT_LANGUAGE")
 

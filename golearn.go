@@ -25,6 +25,7 @@ type Row struct {
 	ID        int
 	Word      string
 	Translate string
+	Category  string
 }
 
 // Category represents category model.
