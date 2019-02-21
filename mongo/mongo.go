@@ -12,9 +12,10 @@ import (
 )
 
 const (
-	usersCollection  = "users"
-	statesCollection = "states"
-	wordsCollection  = "words"
+	usersCollection      = "users"
+	statesCollection     = "states"
+	wordsCollection      = "words"
+	activitiesCollection = "stats"
 )
 
 // Service of mongodb
@@ -245,4 +246,8 @@ func (s Service) SetUserCategory(userID string, category string) error {
 			"category": category,
 		},
 	})
+}
+
+func (s Service) InsertActivity(activity golearn.Activity) error {
+	return s.session.DB(s.db).C(activitiesCollection).Insert(activity)
 }

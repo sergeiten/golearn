@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/pkg/errors"
 )
@@ -64,6 +65,15 @@ type State struct {
 	Timestamp int64
 }
 
+// Activity represents user activity.
+type Activity struct {
+	UserID    string
+	State     State
+	Answer    string
+	IsRight   bool
+	Timestamp time.Time
+}
+
 // DBService ...
 type DBService interface {
 	RandomQuestion(category string) (Row, error)
@@ -79,6 +89,7 @@ type DBService interface {
 	SetUserMode(userID string, mode string) error
 	GetCategories(userID string) ([]Category, error)
 	SetUserCategory(userID string, category string) error
+	InsertActivity(activity Activity) error
 	Close()
 }
 

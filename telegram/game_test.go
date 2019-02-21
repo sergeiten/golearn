@@ -66,6 +66,33 @@ func TestAgain(t *testing.T) {
 		Message:  "command",
 	}
 
+	state := golearn.State{
+		UserKey: "177374215",
+		Question: golearn.Row{
+			Word:      "question word",
+			Translate: "question translate",
+		},
+		Answers: []golearn.Row{
+			{
+				Word:      "answer word 1",
+				Translate: "answer translate 1",
+			},
+			{
+				Word:      "answer word 2",
+				Translate: "answer translate 2",
+			},
+			{
+				Word:      "answer word 3",
+				Translate: "answer translate 3",
+			},
+			{
+				Word:      "answer word 4",
+				Translate: "answer translate 4",
+			},
+		},
+		Mode: golearn.ModePicking,
+	}
+
 	testCases := map[string]struct {
 		State   golearn.State
 		Error   error
@@ -73,32 +100,7 @@ func TestAgain(t *testing.T) {
 		Message string
 	}{
 		"again with no error": {
-			State: golearn.State{
-				UserKey: "177374215",
-				Question: golearn.Row{
-					Word:      "question word",
-					Translate: "question translate",
-				},
-				Answers: []golearn.Row{
-					{
-						Word:      "answer word 1",
-						Translate: "answer translate 1",
-					},
-					{
-						Word:      "answer word 2",
-						Translate: "answer translate 2",
-					},
-					{
-						Word:      "answer word 3",
-						Translate: "answer translate 3",
-					},
-					{
-						Word:      "answer word 4",
-						Translate: "answer translate 4",
-					},
-				},
-				Mode: golearn.ModePicking,
-			},
+			State: state,
 			Error: nil,
 			Markup: ReplyMarkup{
 				Keyboard: [][]string{
@@ -120,32 +122,7 @@ func TestAgain(t *testing.T) {
 			Message: "question word",
 		},
 		"again with error": {
-			State: golearn.State{
-				UserKey: "177374215",
-				Question: golearn.Row{
-					Word:      "question word",
-					Translate: "question translate",
-				},
-				Answers: []golearn.Row{
-					{
-						Word:      "answer word 1",
-						Translate: "answer translate 1",
-					},
-					{
-						Word:      "answer word 2",
-						Translate: "answer translate 2",
-					},
-					{
-						Word:      "answer word 3",
-						Translate: "answer translate 3",
-					},
-					{
-						Word:      "answer word 4",
-						Translate: "answer translate 4",
-					},
-				},
-				Mode: golearn.ModePicking,
-			},
+			State: state,
 			Error: sampleError,
 			Markup: ReplyMarkup{
 				Keyboard:       nil,
@@ -401,8 +378,13 @@ func TestAnswer(t *testing.T) {
 		Message:  "command",
 	}
 
+	now := func() time.Time {
+		return time.Date(2019, 02, 21, 0, 0, 0, 0, time.UTC)
+	}
+
 	testCases := map[string]struct {
 		UpdateMessage string
+		Activity      golearn.Activity
 		Message       string
 		Markup        ReplyMarkup
 		Error         error
@@ -410,14 +392,28 @@ func TestAnswer(t *testing.T) {
 	}{
 		"with error": {
 			UpdateMessage: "message",
-			Message:       "",
-			Markup:        ReplyMarkup{},
-			Error:         errors.New("sample error"),
-			Mode:          golearn.ModePicking,
+			Activity: golearn.Activity{
+				UserID:    update.UserID,
+				State:     state,
+				Answer:    "message",
+				IsRight:   true,
+				Timestamp: now(),
+			},
+			Message: "",
+			Markup:  ReplyMarkup{},
+			Error:   errors.New("sample error"),
+			Mode:    golearn.ModePicking,
 		},
 		"picking mode right answer": {
 			UpdateMessage: "question translate",
-			Message:       lang["right"],
+			Activity: golearn.Activity{
+				UserID:    update.UserID,
+				State:     state,
+				Answer:    "question translate",
+				IsRight:   true,
+				Timestamp: now(),
+			},
+			Message: lang["right"],
 			Markup: ReplyMarkup{
 				Keyboard: [][]string{
 					{
@@ -431,7 +427,14 @@ func TestAnswer(t *testing.T) {
 		},
 		"picking mode wrong answer": {
 			UpdateMessage: "wrong",
-			Message:       lang["wrong"],
+			Activity: golearn.Activity{
+				UserID:    update.UserID,
+				State:     state,
+				Answer:    "wrong",
+				IsRight:   false,
+				Timestamp: now(),
+			},
+			Message: lang["wrong"],
 			Markup: ReplyMarkup{
 				Keyboard: [][]string{
 					{
@@ -448,7 +451,14 @@ func TestAnswer(t *testing.T) {
 		},
 		"typing mode right answer": {
 			UpdateMessage: "question word",
-			Message:       lang["right"],
+			Activity: golearn.Activity{
+				UserID:    update.UserID,
+				State:     state,
+				Answer:    "question word",
+				IsRight:   true,
+				Timestamp: now(),
+			},
+			Message: lang["right"],
 			Markup: ReplyMarkup{
 				Keyboard: [][]string{
 					{
@@ -462,7 +472,14 @@ func TestAnswer(t *testing.T) {
 		},
 		"typing mode wrong answer": {
 			UpdateMessage: "wrong",
-			Message:       lang["wrong"] + "\n\n" + fmt.Sprintf(lang["right_answer_is"], state.Question.Word),
+			Activity: golearn.Activity{
+				UserID:    update.UserID,
+				State:     state,
+				Answer:    "wrong",
+				IsRight:   false,
+				Timestamp: now(),
+			},
+			Message: lang["wrong"] + "\n\n" + fmt.Sprintf(lang["right_answer_is"], state.Question.Word),
 			Markup: ReplyMarkup{
 				Keyboard: [][]string{
 					{
@@ -495,7 +512,11 @@ func TestAnswer(t *testing.T) {
 
 			dbService.On("GetState", update.UserID).Return(state, tc.Error)
 
-			message, markup, err := handler.answer(&update)
+			if tc.Error == nil {
+				dbService.On("InsertActivity", tc.Activity).Return(nil)
+			}
+
+			message, markup, err := handler.answer(&update, now)
 
 			assert.Equal(t, tc.Message, message)
 			assert.Equal(t, tc.Markup, markup)

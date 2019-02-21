@@ -6,6 +6,7 @@ import (
 	"math"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/sergeiten/golearn"
 )
@@ -115,7 +116,7 @@ func (h *Handler) handle(update *golearn.Update) (string, ReplyMarkup, error) {
 	case update.Message == h.lang["reset_category"]:
 		return h.resetCategory(update)
 	default:
-		return h.answer(update)
+		return h.answer(update, time.Now)
 	}
 }
 

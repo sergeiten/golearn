@@ -101,6 +101,20 @@ func (_m *DBService) GetUser(userID string) (golearn.User, error) {
 	return r0, r1
 }
 
+// InsertActivity provides a mock function with given fields: activity
+func (_m *DBService) InsertActivity(activity golearn.Activity) error {
+	ret := _m.Called(activity)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(golearn.Activity) error); ok {
+		r0 = rf(activity)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // InsertUser provides a mock function with given fields: user
 func (_m *DBService) InsertUser(user golearn.User) error {
 	ret := _m.Called(user)

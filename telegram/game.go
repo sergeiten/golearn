@@ -103,14 +103,27 @@ func (h *Handler) startWithTypingMode(update *golearn.Update) (message string, m
 	return question.Translate, keyboard, nil
 }
 
-func (h *Handler) answer(update *golearn.Update) (message string, markup ReplyMarkup, err error) {
+func (h *Handler) answer(update *golearn.Update, now func() time.Time) (message string, markup ReplyMarkup, err error) {
 	state, err := h.db.GetState(update.UserID)
 	if err != nil {
 		return "", ReplyMarkup{}, err
 	}
 
-	var keyboard ReplyMarkup
 	isRight := h.isAnswerRight(state, update)
+
+	// save activity
+	err = h.db.InsertActivity(golearn.Activity{
+		UserID:    update.UserID,
+		State:     state,
+		Answer:    update.Message,
+		IsRight:   isRight,
+		Timestamp: now(),
+	})
+	if err != nil {
+		return "", ReplyMarkup{}, err
+	}
+
+	var keyboard ReplyMarkup
 
 	keyboard.ResizeKeyboard = true
 	keyboard.Keyboard = [][]string{

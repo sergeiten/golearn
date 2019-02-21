@@ -5,9 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/sergeiten/golearn"
+	"github.com/stretchr/testify/assert"
 )
 
 var dbService *Service
@@ -294,4 +293,20 @@ func TestService_GetCategories(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, len(expectedCategories), len(categories))
 	assert.Equal(t, expectedCategories, categories)
+}
+
+func TestService_InsertActivity(t *testing.T) {
+	if err := prepare(false); err != nil {
+		t.Fatalf("failed to prepare test db: %v", err)
+	}
+
+	err := dbService.InsertActivity(golearn.Activity{
+		UserID:    testUser.UserID,
+		State:     testState,
+		IsRight:   true,
+		Answer:    "test answer",
+		Timestamp: time.Now(),
+	})
+
+	assert.Nil(t, err)
 }
