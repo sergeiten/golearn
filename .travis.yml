@@ -11,10 +11,8 @@ before_script:
   - sleep 3
 
 script:
-#  - go test -v -covermode=count -coverprofile=coverage.out ./...
-#  - $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
-  - go test ./...
-  - $GOPATH/bin/goveralls -service=travis-ci
+  - go test -coverprofile=coverage.out ./...
+  - $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
 
 env:
   global:
