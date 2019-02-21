@@ -98,10 +98,10 @@ func (s Service) RandomQuestion(category string) (golearn.Row, error) {
 // Generated random number is equal 7, that means function returns just 1 rows (8).
 // Function moves cursor to position 5 to return enough rows (6,7,8).
 /*
-								  Moved         Generated
-									+---------------+
-									|               |
-									v               v
+                                  Moved         Generated
+                                    +---------------+
+                                    |               |
+                                    v               v
 +-------+-------+-------+-------+---+---+-------+---+---+-------+
 |       |       |       |       |       |       |       |       |
 |   1   |   2   |   3   |   4   |   5   |   6   |   7   |   8   |
