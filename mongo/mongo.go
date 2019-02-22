@@ -251,3 +251,74 @@ func (s Service) SetUserCategory(userID string, category string) error {
 func (s Service) InsertActivity(activity golearn.Activity) error {
 	return s.session.DB(s.db).C(activitiesCollection).Insert(activity)
 }
+
+func (s Service) GetStatistics(userID string) ([]golearn.Statistics, error) {
+	var statistics []golearn.Statistics
+
+	err := s.session.DB(s.db).C(activitiesCollection).Pipe([]bson.M{
+		{
+			"$group": bson.M{
+				"_id": bson.M{
+					"year": bson.M{
+						"$year": "$timestamp",
+					},
+					"month": bson.M{
+						"$month": "$timestamp",
+					},
+					"day": bson.M{
+						"$dayOfMonth": "$timestamp",
+					},
+				},
+				"year": bson.M{
+					"$first": bson.M{
+						"$year": "$timestamp",
+					},
+				},
+				"month": bson.M{
+					"$first": bson.M{
+						"$month": "$timestamp",
+					},
+				},
+				"day": bson.M{
+					"$first": bson.M{
+						"$dayOfMonth": "$timestamp",
+					},
+				},
+				"total": bson.M{
+					"$sum": 1,
+				},
+				"right": bson.M{
+					"$sum": bson.M{
+						"$cond": bson.M{
+							"if": bson.M{
+								"$eq": []interface{}{"$isright", true},
+							},
+							"then": 1,
+							"else": 0,
+						},
+					},
+				},
+				"wrong": bson.M{
+					"$sum": bson.M{
+						"$cond": bson.M{
+							"if": bson.M{
+								"$eq": []interface{}{"$isright", false},
+							},
+							"then": 1,
+							"else": 0,
+						},
+					},
+				},
+			},
+		},
+		{
+			"$sort": bson.D{
+				{"year", 1},
+				{"month", 1},
+				{"day", 1},
+			},
+		},
+	}).All(&statistics)
+
+	return statistics, err
+}

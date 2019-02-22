@@ -13,6 +13,7 @@ var dbService *Service
 var testUser golearn.User
 var testWords []golearn.Row
 var testState golearn.State
+var testActivities []golearn.Activity
 
 func prepare(seeding bool) error {
 	cfg := &golearn.Config{}
@@ -83,6 +84,72 @@ func prepare(seeding bool) error {
 		Timestamp: time.Now().Unix(),
 	}
 
+	testActivities = []golearn.Activity{
+		{
+			UserID:    testUser.UserID,
+			State:     testState,
+			Answer:    "test",
+			IsRight:   true,
+			Timestamp: time.Date(2019, 2, 1, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			UserID:    testUser.UserID,
+			State:     testState,
+			Answer:    "test",
+			IsRight:   true,
+			Timestamp: time.Date(2019, 2, 1, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			UserID:    testUser.UserID,
+			State:     testState,
+			Answer:    "test",
+			IsRight:   false,
+			Timestamp: time.Date(2019, 2, 1, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			UserID:    testUser.UserID,
+			State:     testState,
+			Answer:    "test",
+			IsRight:   true,
+			Timestamp: time.Date(2019, 2, 2, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			UserID:    testUser.UserID,
+			State:     testState,
+			Answer:    "test",
+			IsRight:   false,
+			Timestamp: time.Date(2019, 2, 2, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			UserID:    testUser.UserID,
+			State:     testState,
+			Answer:    "test",
+			IsRight:   false,
+			Timestamp: time.Date(2019, 2, 2, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			UserID:    testUser.UserID,
+			State:     testState,
+			Answer:    "test",
+			IsRight:   false,
+			Timestamp: time.Date(2019, 2, 3, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			UserID:    testUser.UserID,
+			State:     testState,
+			Answer:    "test",
+			IsRight:   false,
+			Timestamp: time.Date(2019, 2, 3, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			UserID:    testUser.UserID,
+			State:     testState,
+			Answer:    "test",
+			IsRight:   false,
+			Timestamp: time.Date(2019, 2, 3, 0, 0, 0, 0, time.UTC),
+		},
+	}
+
 	if err := clean(); err != nil {
 		return err
 	}
@@ -108,6 +175,13 @@ func seed() error {
 
 		if err != nil {
 			log.Fatalf("failed to insert test user")
+		}
+	}
+
+	for _, activity := range testActivities {
+		err := dbService.InsertActivity(activity)
+		if err != nil {
+			log.Fatalf("failed to insert activity")
 		}
 	}
 
@@ -309,4 +383,42 @@ func TestService_InsertActivity(t *testing.T) {
 	})
 
 	assert.Nil(t, err)
+}
+
+func TestService_GetStatistics(t *testing.T) {
+	if err := prepare(true); err != nil {
+		t.Fatalf("failed to prepare test db: %v", err)
+	}
+
+	expectedStatistics := []golearn.Statistics{
+		{
+			Year:  2019,
+			Month: 2,
+			Day:   1,
+			Total: 3,
+			Right: 2,
+			Wrong: 1,
+		},
+		{
+			Year:  2019,
+			Month: 2,
+			Day:   2,
+			Total: 3,
+			Right: 1,
+			Wrong: 2,
+		},
+		{
+			Year:  2019,
+			Month: 2,
+			Day:   3,
+			Total: 3,
+			Right: 0,
+			Wrong: 3,
+		},
+	}
+
+	statistics, err := dbService.GetStatistics(testUser.UserID)
+
+	assert.Nil(t, err)
+	assert.Equal(t, expectedStatistics, statistics)
 }

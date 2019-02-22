@@ -80,6 +80,29 @@ func (_m *DBService) GetState(_a0 string) (golearn.State, error) {
 	return r0, r1
 }
 
+// GetStatistics provides a mock function with given fields: userID
+func (_m *DBService) GetStatistics(userID string) ([]golearn.Statistics, error) {
+	ret := _m.Called(userID)
+
+	var r0 []golearn.Statistics
+	if rf, ok := ret.Get(0).(func(string) []golearn.Statistics); ok {
+		r0 = rf(userID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]golearn.Statistics)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(userID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetUser provides a mock function with given fields: userID
 func (_m *DBService) GetUser(userID string) (golearn.User, error) {
 	ret := _m.Called(userID)

@@ -74,6 +74,16 @@ type Activity struct {
 	Timestamp time.Time
 }
 
+// Statistics represents user statistics.
+type Statistics struct {
+	Year  int `json:"year"`
+	Month int `json:"month"`
+	Day   int `json:"day"`
+	Total int `json:"total"`
+	Right int `json:"right"`
+	Wrong int `json:"wrong"`
+}
+
 // DBService ...
 type DBService interface {
 	RandomQuestion(category string) (Row, error)
@@ -90,6 +100,7 @@ type DBService interface {
 	GetCategories(userID string) ([]Category, error)
 	SetUserCategory(userID string, category string) error
 	InsertActivity(activity Activity) error
+	GetStatistics(userID string) ([]Statistics, error)
 	Close()
 }
 
