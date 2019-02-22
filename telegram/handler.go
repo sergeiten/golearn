@@ -166,16 +166,16 @@ func (h *Handler) statistics(update *golearn.Update) (message string, markup Rep
 		return "", ReplyMarkup{}, err
 	}
 
-	message = h.lang["statistics"] + "\n\n"
+	message = h.lang["statistics_text"] + "\n\n"
 
 	message += h.lang["statistics_period_today"] + "\n"
-	message += fmt.Sprintf(h.lang["statistics_period_summary"], statistics.Today.Total, statistics.Today.Right, statistics.Today.Wrong) + "\n\n"
+	message += fmt.Sprintf(h.lang["statistics_period_summary"], statistics.Today.Total, statistics.Today.Right, statistics.Today.Wrong) + "\n"
 
 	message += h.lang["statistics_period_week"] + "\n"
-	message += fmt.Sprintf(h.lang["statistics_period_summary"], statistics.Week.Total, statistics.Week.Right, statistics.Week.Wrong) + "\n\n"
+	message += fmt.Sprintf(h.lang["statistics_period_summary"], statistics.Week.Total, statistics.Week.Right, statistics.Week.Wrong) + "\n"
 
 	message += h.lang["statistics_period_month"] + "\n"
-	message += fmt.Sprintf(h.lang["statistics_period_summary"], statistics.Month.Total, statistics.Month.Right, statistics.Month.Wrong) + "\n\n"
+	message += fmt.Sprintf(h.lang["statistics_period_summary"], statistics.Month.Total, statistics.Month.Right, statistics.Month.Wrong)
 
 	return message, h.mainMenuKeyboard(), nil
 }

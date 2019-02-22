@@ -24,9 +24,9 @@
   "category_set": "Category has been set successfully",
   "category_reset": "Category has been reset successfully",
   "reset_category": "/Reset category",
-  "statistics_period_today": "Today",
-  "statistics_period_week": "Week",
-  "statistics_period_month": "Month",
+  "statistics_period_today": "<i>Today</i>",
+  "statistics_period_week": "<i>Week</i>",
+  "statistics_period_month": "<i>Month</i>",
   "statistics_period_summary": "Total: %d\nRight: %d\nWrong: %d\n",
-  "statistics_summary": "<b>Statistics</b>"
+  "statistics_text": "<b>Statistics</b>"
 }

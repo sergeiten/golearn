@@ -24,9 +24,9 @@
   "category_set": "Категория успешно установлена",
   "category_reset": "Категория была успешно сброшена",
   "reset_category": "/Сбросить категорию",
-  "statistics_period_today": "За сегодня",
-  "statistics_period_week": "За неделю",
-  "statistics_period_month": "За месяц",
+  "statistics_period_today": "<i>За сегодня</i>",
+  "statistics_period_week": "<i>За неделю</i>",
+  "statistics_period_month": "<i>За месяц</i>",
   "statistics_period_summary": "Всего: %d\nПравильных: %d\nНе правильных: %d\n",
-  "statistics_summary": "<b>Статистика</b>"
+  "statistics_text": "<b>Статистика</b>"
 }
