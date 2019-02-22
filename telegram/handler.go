@@ -103,6 +103,8 @@ func (h *Handler) handle(update *golearn.Update) (string, ReplyMarkup, error) {
 		return h.again(update)
 	case update.Message == h.lang["settings"]:
 		return h.settings(update)
+	case update.Message == h.lang["statistics"]:
+		return h.statistics(update)
 	case update.Message == h.lang["mode_picking"]:
 		return h.setMode(golearn.ModePicking)
 	case update.Message == h.lang["mode_typing"]:
@@ -153,6 +155,29 @@ func (h *Handler) settings(update *golearn.Update) (message string, markup Reply
 	}
 
 	return h.lang["mode_explain"], keyboard, nil
+}
+
+func (h *Handler) statistics(update *golearn.Update) (message string, markup ReplyMarkup, err error) {
+	year, month, day := time.Now().Date()
+	_, week := time.Now().ISOWeek()
+
+	statistics, err := h.db.GetStatistics(update.UserID, year, int(month), week, day)
+	if err != nil {
+		return "", ReplyMarkup{}, err
+	}
+
+	message = h.lang["statistics"] + "\n\n"
+
+	message += h.lang["statistics_period_today"] + "\n"
+	message += fmt.Sprintf(h.lang["statistics_period_summary"], statistics.Today.Total, statistics.Today.Right, statistics.Today.Wrong) + "\n\n"
+
+	message += h.lang["statistics_period_week"] + "\n"
+	message += fmt.Sprintf(h.lang["statistics_period_summary"], statistics.Week.Total, statistics.Week.Right, statistics.Week.Wrong) + "\n\n"
+
+	message += h.lang["statistics_period_month"] + "\n"
+	message += fmt.Sprintf(h.lang["statistics_period_summary"], statistics.Month.Total, statistics.Month.Right, statistics.Month.Wrong) + "\n\n"
+
+	return message, h.mainMenuKeyboard(), nil
 }
 
 func (h *Handler) categories(update *golearn.Update) (message string, markup ReplyMarkup, err error) {

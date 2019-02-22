@@ -9,6 +9,9 @@ func (h *Handler) mainMenuKeyboard() ReplyMarkup {
 		Keyboard: [][]string{
 			{
 				h.lang["start"],
+				h.lang["statistics"],
+			},
+			{
 				h.lang["settings"],
 				h.lang["help"],
 			},

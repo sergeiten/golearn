@@ -10,6 +10,7 @@
   "no_words": "There is no words yet",
   "main_menu": "/Main Menu",
   "settings": "/Settings",
+  "statistics": "/Statistics",
   "settings_icon": "⚙️",
   "mode_picking": "⚙️ Picking mode",
   "mode_typing": "⚙️ Typing mode",
@@ -22,5 +23,10 @@
   "pick_category": "Pick category",
   "category_set": "Category has been set successfully",
   "category_reset": "Category has been reset successfully",
-  "reset_category": "/Reset category"
+  "reset_category": "/Reset category",
+  "statistics_period_today": "Today",
+  "statistics_period_week": "Week",
+  "statistics_period_month": "Month",
+  "statistics_period_summary": "Total: %d\nRight: %d\nWrong: %d\n",
+  "statistics_summary": "<b>Statistics</b>"
 }

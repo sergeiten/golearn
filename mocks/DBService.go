@@ -80,22 +80,20 @@ func (_m *DBService) GetState(_a0 string) (golearn.State, error) {
 	return r0, r1
 }
 
-// GetStatistics provides a mock function with given fields: userID
-func (_m *DBService) GetStatistics(userID string) ([]golearn.Statistics, error) {
-	ret := _m.Called(userID)
+// GetStatistics provides a mock function with given fields: userID, year, month, week, day
+func (_m *DBService) GetStatistics(userID string, year int, month int, week int, day int) (golearn.Statistics, error) {
+	ret := _m.Called(userID, year, month, week, day)
 
-	var r0 []golearn.Statistics
-	if rf, ok := ret.Get(0).(func(string) []golearn.Statistics); ok {
-		r0 = rf(userID)
+	var r0 golearn.Statistics
+	if rf, ok := ret.Get(0).(func(string, int, int, int, int) golearn.Statistics); ok {
+		r0 = rf(userID, year, month, week, day)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]golearn.Statistics)
-		}
+		r0 = ret.Get(0).(golearn.Statistics)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(userID)
+	if rf, ok := ret.Get(1).(func(string, int, int, int, int) error); ok {
+		r1 = rf(userID, year, month, week, day)
 	} else {
 		r1 = ret.Error(1)
 	}

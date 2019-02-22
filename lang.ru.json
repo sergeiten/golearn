@@ -10,6 +10,7 @@
   "no_words": "Нету слов в этой коллекции",
   "main_menu": "/Главное Меню",
   "settings": "/Настройки",
+  "statistics": "/Статистика",
   "settings_icon": "⚙️",
   "mode_picking": "⚙️ Режим выбора правильного ответа",
   "mode_typing": "⚙️ Режим ввода правильного ответа",
@@ -22,5 +23,10 @@
   "pick_category": "Выберите категорию",
   "category_set": "Категория успешно установлена",
   "category_reset": "Категория была успешно сброшена",
-  "reset_category": "/Сбросить категорию"
+  "reset_category": "/Сбросить категорию",
+  "statistics_period_today": "За сегодня",
+  "statistics_period_week": "За неделю",
+  "statistics_period_month": "За месяц",
+  "statistics_period_summary": "Всего: %d\nПравильных: %d\nНе правильных: %d\n",
+  "statistics_summary": "<b>Статистика</b>"
 }

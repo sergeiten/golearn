@@ -199,6 +199,9 @@ func TestSetMode(t *testing.T) {
 				Keyboard: [][]string{
 					{
 						lang["start"],
+						lang["statistics"],
+					},
+					{
 						lang["settings"],
 						lang["help"],
 					},
@@ -279,6 +282,9 @@ func TestSetCategory(t *testing.T) {
 				Keyboard: [][]string{
 					{
 						lang["start"],
+						lang["statistics"],
+					},
+					{
 						lang["settings"],
 						lang["help"],
 					},

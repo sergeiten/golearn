@@ -21,6 +21,9 @@ func TestMainMenuKeyboard(t *testing.T) {
 		Keyboard: [][]string{
 			{
 				lang["start"],
+				lang["statistics"],
+			},
+			{
 				lang["settings"],
 				lang["help"],
 			},
@@ -48,6 +51,9 @@ func TestMainMenu(t *testing.T) {
 		Keyboard: [][]string{
 			{
 				lang["start"],
+				lang["statistics"],
+			},
+			{
 				lang["settings"],
 				lang["help"],
 			},
@@ -85,6 +91,9 @@ func TestHelp(t *testing.T) {
 		Keyboard: [][]string{
 			{
 				lang["start"],
+				lang["statistics"],
+			},
+			{
 				lang["settings"],
 				lang["help"],
 			},

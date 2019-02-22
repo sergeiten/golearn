@@ -90,63 +90,77 @@ func prepare(seeding bool) error {
 			State:     testState,
 			Answer:    "test",
 			IsRight:   true,
-			Timestamp: time.Date(2019, 2, 1, 0, 0, 0, 0, time.UTC),
+			Timestamp: time.Date(2019, 2, 14, 0, 0, 0, 0, time.UTC),
 		},
 		{
 			UserID:    testUser.UserID,
 			State:     testState,
 			Answer:    "test",
 			IsRight:   true,
-			Timestamp: time.Date(2019, 2, 1, 0, 0, 0, 0, time.UTC),
-		},
-		{
-			UserID:    testUser.UserID,
-			State:     testState,
-			Answer:    "test",
-			IsRight:   false,
-			Timestamp: time.Date(2019, 2, 1, 0, 0, 0, 0, time.UTC),
+			Timestamp: time.Date(2019, 2, 15, 0, 0, 0, 0, time.UTC),
 		},
 		{
 			UserID:    testUser.UserID,
 			State:     testState,
 			Answer:    "test",
 			IsRight:   true,
-			Timestamp: time.Date(2019, 2, 2, 0, 0, 0, 0, time.UTC),
+			Timestamp: time.Date(2019, 2, 20, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			UserID:    testUser.UserID,
+			State:     testState,
+			Answer:    "test",
+			IsRight:   true,
+			Timestamp: time.Date(2019, 2, 20, 0, 0, 0, 0, time.UTC),
 		},
 		{
 			UserID:    testUser.UserID,
 			State:     testState,
 			Answer:    "test",
 			IsRight:   false,
-			Timestamp: time.Date(2019, 2, 2, 0, 0, 0, 0, time.UTC),
+			Timestamp: time.Date(2019, 2, 20, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			UserID:    testUser.UserID,
+			State:     testState,
+			Answer:    "test",
+			IsRight:   true,
+			Timestamp: time.Date(2019, 2, 21, 0, 0, 0, 0, time.UTC),
 		},
 		{
 			UserID:    testUser.UserID,
 			State:     testState,
 			Answer:    "test",
 			IsRight:   false,
-			Timestamp: time.Date(2019, 2, 2, 0, 0, 0, 0, time.UTC),
+			Timestamp: time.Date(2019, 2, 21, 0, 0, 0, 0, time.UTC),
 		},
 		{
 			UserID:    testUser.UserID,
 			State:     testState,
 			Answer:    "test",
 			IsRight:   false,
-			Timestamp: time.Date(2019, 2, 3, 0, 0, 0, 0, time.UTC),
+			Timestamp: time.Date(2019, 2, 21, 0, 0, 0, 0, time.UTC),
 		},
 		{
 			UserID:    testUser.UserID,
 			State:     testState,
 			Answer:    "test",
 			IsRight:   false,
-			Timestamp: time.Date(2019, 2, 3, 0, 0, 0, 0, time.UTC),
+			Timestamp: time.Date(2019, 2, 22, 0, 0, 0, 0, time.UTC),
 		},
 		{
 			UserID:    testUser.UserID,
 			State:     testState,
 			Answer:    "test",
 			IsRight:   false,
-			Timestamp: time.Date(2019, 2, 3, 0, 0, 0, 0, time.UTC),
+			Timestamp: time.Date(2019, 2, 22, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			UserID:    testUser.UserID,
+			State:     testState,
+			Answer:    "test",
+			IsRight:   false,
+			Timestamp: time.Date(2019, 2, 22, 0, 0, 0, 0, time.UTC),
 		},
 	}
 
@@ -390,34 +404,25 @@ func TestService_GetStatistics(t *testing.T) {
 		t.Fatalf("failed to prepare test db: %v", err)
 	}
 
-	expectedStatistics := []golearn.Statistics{
-		{
-			Year:  2019,
-			Month: 2,
-			Day:   1,
-			Total: 3,
-			Right: 2,
-			Wrong: 1,
-		},
-		{
-			Year:  2019,
-			Month: 2,
-			Day:   2,
-			Total: 3,
-			Right: 1,
-			Wrong: 2,
-		},
-		{
-			Year:  2019,
-			Month: 2,
-			Day:   3,
+	expectedStatistics := golearn.Statistics{
+		Today: golearn.StatRow{
 			Total: 3,
 			Right: 0,
 			Wrong: 3,
 		},
+		Week: golearn.StatRow{
+			Total: 9,
+			Right: 3,
+			Wrong: 6,
+		},
+		Month: golearn.StatRow{
+			Total: 11,
+			Right: 5,
+			Wrong: 6,
+		},
 	}
 
-	statistics, err := dbService.GetStatistics(testUser.UserID)
+	statistics, err := dbService.GetStatistics(testUser.UserID, 2019, 2, 8, 22)
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedStatistics, statistics)

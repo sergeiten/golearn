@@ -74,14 +74,18 @@ type Activity struct {
 	Timestamp time.Time
 }
 
-// Statistics represents user statistics.
-type Statistics struct {
-	Year  int `json:"year"`
-	Month int `json:"month"`
-	Day   int `json:"day"`
+// StatRow represents user statistics for specific period.
+type StatRow struct {
 	Total int `json:"total"`
 	Right int `json:"right"`
 	Wrong int `json:"wrong"`
+}
+
+// Statistics represents group of periods.
+type Statistics struct {
+	Today StatRow `json:"today"`
+	Week  StatRow `json:"week"`
+	Month StatRow `json:"month"`
 }
 
 // DBService ...
@@ -100,7 +104,7 @@ type DBService interface {
 	GetCategories(userID string) ([]Category, error)
 	SetUserCategory(userID string, category string) error
 	InsertActivity(activity Activity) error
-	GetStatistics(userID string) ([]Statistics, error)
+	GetStatistics(userID string, year int, month int, week int, day int) (Statistics, error)
 	Close()
 }
 

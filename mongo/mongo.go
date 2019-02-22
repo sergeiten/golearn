@@ -252,73 +252,190 @@ func (s Service) InsertActivity(activity golearn.Activity) error {
 	return s.session.DB(s.db).C(activitiesCollection).Insert(activity)
 }
 
-func (s Service) GetStatistics(userID string) ([]golearn.Statistics, error) {
-	var statistics []golearn.Statistics
+func (s Service) GetStatistics(userID string, year int, month int, week int, day int) (golearn.Statistics, error) {
+	pipe := []bson.M{
+		{
+			"$facet": bson.M{
+				"today": []bson.M{
+					{
+						"$project": bson.M{
+							"year": bson.M{
+								"$year": "$timestamp",
+							},
+							"day": bson.M{
+								"$dayOfMonth": "$timestamp",
+							},
+							"isright": "$isright",
+							"userid":  "$userid",
+						},
+					},
+					{
+						"$match": bson.M{
+							"year":   year,
+							"day":    day,
+							"userid": userID,
+						},
+					},
+					{
+						"$group": bson.M{
+							"_id": "$day",
+							"total": bson.M{
+								"$sum": 1,
+							},
+							"right": bson.M{
+								"$sum": bson.M{
+									"$cond": bson.M{
+										"if": bson.M{
+											"$eq": []interface{}{"$isright", true},
+										},
+										"then": 1,
+										"else": 0,
+									},
+								},
+							},
+							"wrong": bson.M{
+								"$sum": bson.M{
+									"$cond": bson.M{
+										"if": bson.M{
+											"$eq": []interface{}{"$isright", false},
+										},
+										"then": 1,
+										"else": 0,
+									},
+								},
+							},
+						},
+					},
+				},
+				"week": []bson.M{
+					{
+						"$project": bson.M{
+							"year": bson.M{
+								"$year": "$timestamp",
+							},
+							"week": bson.M{
+								"$isoWeek": "$timestamp",
+							},
+							"isright": "$isright",
+							"userid":  "$userid",
+						},
+					},
+					{
+						"$match": bson.M{
+							"year":   year,
+							"week":   week,
+							"userid": userID,
+						},
+					},
+					{
+						"$group": bson.M{
+							"_id": "$week",
+							"total": bson.M{
+								"$sum": 1,
+							},
+							"right": bson.M{
+								"$sum": bson.M{
+									"$cond": bson.M{
+										"if": bson.M{
+											"$eq": []interface{}{"$isright", true},
+										},
+										"then": 1,
+										"else": 0,
+									},
+								},
+							},
+							"wrong": bson.M{
+								"$sum": bson.M{
+									"$cond": bson.M{
+										"if": bson.M{
+											"$eq": []interface{}{"$isright", false},
+										},
+										"then": 1,
+										"else": 0,
+									},
+								},
+							},
+						},
+					},
+				},
+				"month": []bson.M{
+					{
+						"$project": bson.M{
+							"year": bson.M{
+								"$year": "$timestamp",
+							},
+							"month": bson.M{
+								"$month": "$timestamp",
+							},
+							"isright": "$isright",
+							"userid":  "$userid",
+						},
+					},
+					{
+						"$match": bson.M{
+							"year":   year,
+							"month":  month,
+							"userid": userID,
+						},
+					},
+					{
+						"$group": bson.M{
+							"_id": "$month",
+							"total": bson.M{
+								"$sum": 1,
+							},
+							"right": bson.M{
+								"$sum": bson.M{
+									"$cond": bson.M{
+										"if": bson.M{
+											"$eq": []interface{}{"$isright", true},
+										},
+										"then": 1,
+										"else": 0,
+									},
+								},
+							},
+							"wrong": bson.M{
+								"$sum": bson.M{
+									"$cond": bson.M{
+										"if": bson.M{
+											"$eq": []interface{}{"$isright", false},
+										},
+										"then": 1,
+										"else": 0,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
 
-	err := s.session.DB(s.db).C(activitiesCollection).Pipe([]bson.M{
-		{
-			"$group": bson.M{
-				"_id": bson.M{
-					"year": bson.M{
-						"$year": "$timestamp",
-					},
-					"month": bson.M{
-						"$month": "$timestamp",
-					},
-					"day": bson.M{
-						"$dayOfMonth": "$timestamp",
-					},
-				},
-				"year": bson.M{
-					"$first": bson.M{
-						"$year": "$timestamp",
-					},
-				},
-				"month": bson.M{
-					"$first": bson.M{
-						"$month": "$timestamp",
-					},
-				},
-				"day": bson.M{
-					"$first": bson.M{
-						"$dayOfMonth": "$timestamp",
-					},
-				},
-				"total": bson.M{
-					"$sum": 1,
-				},
-				"right": bson.M{
-					"$sum": bson.M{
-						"$cond": bson.M{
-							"if": bson.M{
-								"$eq": []interface{}{"$isright", true},
-							},
-							"then": 1,
-							"else": 0,
-						},
-					},
-				},
-				"wrong": bson.M{
-					"$sum": bson.M{
-						"$cond": bson.M{
-							"if": bson.M{
-								"$eq": []interface{}{"$isright", false},
-							},
-							"then": 1,
-							"else": 0,
-						},
-					},
-				},
-			},
-		},
-		{
-			"$sort": bson.D{
-				{"year", 1},
-				{"month", 1},
-				{"day", 1},
-			},
-		},
-	}).All(&statistics)
+	var stat struct {
+		Today []golearn.StatRow `json:"today"`
+		Week  []golearn.StatRow `json:"week"`
+		Month []golearn.StatRow `json:"month"`
+	}
+
+	var statistics golearn.Statistics
+
+	err := s.session.DB(s.db).C(activitiesCollection).Pipe(pipe).One(&stat)
+
+	if err != nil {
+		return statistics, err
+	}
+
+	if len(stat.Today) > 0 {
+		statistics.Today = stat.Today[0]
+	}
+	if len(stat.Week) > 0 {
+		statistics.Week = stat.Week[0]
+	}
+	if len(stat.Month) > 0 {
+		statistics.Month = stat.Month[0]
+	}
 
 	return statistics, err
 }
