@@ -24,14 +24,7 @@ const (
 func main() {
 	ctx := context.Background()
 
-	cfg := &golearn.Config{
-		Database: golearn.Database{
-			Host:  "localhost",
-			Port:  "27017",
-			Name:  "golearn",
-			Delay: 3,
-		},
-	}
+	cfg := golearn.ConfigFromEnv()
 
 	for {
 		service, err := mongo.New(cfg)
