@@ -1,29 +1,42 @@
 version: '3'
 services:
-    app:
-        build: 
-          context: .
-          dockerfile: Dockerfile
-        image: sergeiten/golearn:v1
-        volumes:
-          - /tmp:/logs
-        ports:
-          - ${HOST_PORT}:${CONTAINER_PORT}
-        logging:
-          driver: "json-file"
-          options:
-            max-size: "200k"
-            max-file: "10"
-        restart: always
-        env_file:
-          - .env
-    db:
-        image: mongo:3.6
-        environment:
-          - MONGO_DATA_DIR=/data/db
-          - MONGO_LOG_DIR=/dev/null
-        volumes:
-          - ${DB_DATA_DIR}:/data/db
-        ports:
-            - ${HOST_DB_PORT}:${DB_PORT}
-        command: mongod --smallfiles 
+  app:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+    image: sergeiten/golearn:v1
+    volumes:
+      - /tmp:/logs
+    ports:
+      - ${HOST_PORT}:${CONTAINER_PORT}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    restart: always
+    env_file:
+      - .env
+  fetcher:
+    build:
+      context: .
+      dockerfile: docker/fetch/Dockerfile
+    image: sergeiten/golearn-fetcher:v1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    restart: always
+    env_file:
+      - .env
+  db:
+    image: mongo:3.6
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - ${DB_DATA_DIR}:/data/db
+    ports:
+      - ${HOST_DB_PORT}:${DB_PORT}
+    command: mongod --smallfiles

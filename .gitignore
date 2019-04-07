@@ -3,3 +3,5 @@ coverage.out
 .idea
 .env
 .travis/id_rsa
+credentials.json
+token.json

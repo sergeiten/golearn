@@ -23,7 +23,7 @@ type Language map[string]string
 
 // Row ...
 type Row struct {
-	ID        int
+	ID        int `bson:"-"`
 	Word      string
 	Translate string
 	Category  string
@@ -103,6 +103,7 @@ type DBService interface {
 	SetUserMode(userID string, mode string) error
 	GetCategories(userID string) ([]Category, error)
 	SetUserCategory(userID string, category string) error
+	DeleteWordsByCategory(userID string, category string) error
 	InsertActivity(activity Activity) error
 	GetStatistics(userID string, year int, month int, week int, day int) (Statistics, error)
 	Close()

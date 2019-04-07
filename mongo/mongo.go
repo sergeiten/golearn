@@ -439,3 +439,11 @@ func (s Service) GetStatistics(userID string, year int, month int, week int, day
 
 	return statistics, err
 }
+
+func (s Service) DeleteWordsByCategory(userID string, category string) error {
+	_, err := s.session.DB(s.db).C(wordsCollection).RemoveAll(bson.M{
+		"category": category,
+	})
+
+	return err
+}

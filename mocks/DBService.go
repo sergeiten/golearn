@@ -15,6 +15,20 @@ func (_m *DBService) Close() {
 	_m.Called()
 }
 
+// DeleteWordsByCategory provides a mock function with given fields: userID, category
+func (_m *DBService) DeleteWordsByCategory(userID string, category string) error {
+	ret := _m.Called(userID, category)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(userID, category)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // ExistUser provides a mock function with given fields: user
 func (_m *DBService) ExistUser(user golearn.User) (bool, error) {
 	ret := _m.Called(user)
