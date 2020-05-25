@@ -5,3 +5,4 @@ coverage.out
 .travis/id_rsa
 credentials.json
 token.json
+tags
