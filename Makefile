@@ -2,7 +2,7 @@ GO_PACKAGES=$(shell ls -d */ | grep -v vendor)
 
 default: test
 
-build:
+run:
 	docker-compose --project-name golearn up --force-recreate --build --remove-orphans -d
 
 quality:

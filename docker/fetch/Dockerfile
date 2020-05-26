@@ -1,4 +1,4 @@
-FROM golang:1.11 as builder
+FROM golang:1.14 as builder
 
 RUN mkdir -p /go/src/github.com/sergeiten/golearn
 WORKDIR /go/src/github.com/sergeiten/golearn
